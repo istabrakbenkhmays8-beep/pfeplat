@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Container } from "./Container";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { MobileNavToggle } from "./MobileNavToggle";
+import { SearchBar } from "@/components/ui/SearchBar";
 
 type Nav = { href: string; label: string };
 
@@ -32,7 +33,7 @@ export function Header({
           </Link>
 
           {variant === "public" && nav.length > 0 && (
-            <nav className="hidden md:flex items-center gap-1 ms-6">
+            <nav className="hidden lg:flex items-center gap-1 ms-4">
               {nav.map((item) => (
                 <Link
                   key={item.href}
@@ -45,14 +46,13 @@ export function Header({
             </nav>
           )}
 
-          <div className="ms-auto flex items-center gap-2">
-            <button
-              type="button"
-              aria-label="Change language"
-              className="hidden sm:inline-flex h-9 items-center rounded-full border border-border bg-surface px-3 text-sm text-fg transition hover:bg-muted"
-            >
-              EN
-            </button>
+          {variant === "public" && (
+            <div className="hidden md:block ms-auto w-full max-w-sm">
+              <SearchBar size="sm" placeholder="Search courses…" />
+            </div>
+          )}
+
+          <div className={variant === "public" ? "flex items-center gap-2" : "ms-auto flex items-center gap-2"}>
             <ThemeToggle />
             {variant === "public" ? (
               <>

@@ -2,7 +2,10 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 
 const nav = [
-  { href: "/catalog", label: "Courses" },
+  { href: "/catalog", label: "Formations" },
+  { href: "/calendrier", label: "Calendrier" },
+  { href: "/catalog?group=Security", label: "Certifications" },
+  { href: "/about", label: "Qui sommes-nous" },
   { href: "/contact", label: "Contact" },
 ];
 
