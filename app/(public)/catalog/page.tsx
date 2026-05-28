@@ -3,13 +3,13 @@ import { Container } from "@/components/layout/Container";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { CourseCard } from "@/components/cards/CourseCard";
 import {
-  searchCourses,
+  searchCatalog,
   listVendors,
   listGroups,
-} from "@/src/data/queries";
-import type { Vendor } from "@/src/data/seed";
+} from "@/src/repositories/courseRepo";
 
 export const metadata = { title: "Courses" };
+export const dynamic = "force-dynamic";
 
 type SearchParams = Promise<{
   q?: string;
@@ -17,18 +17,15 @@ type SearchParams = Promise<{
   group?: string;
 }>;
 
-const isVendor = (v: string | undefined, list: Vendor[]): v is Vendor =>
-  !!v && (list as string[]).includes(v);
-
 export default async function CatalogPage({ searchParams }: { searchParams: SearchParams }) {
   const sp = await searchParams;
   const q = sp.q?.trim() ?? "";
-  const vendors = listVendors();
-  const groups = listGroups();
-  const vendor: Vendor | "all" = isVendor(sp.vendor, vendors) ? sp.vendor : "all";
-  const group: string | "all" = sp.group && groups.includes(sp.group) ? sp.group : "all";
+  const [vendors, groups] = await Promise.all([listVendors(), listGroups()]);
+  const vendor = sp.vendor && vendors.includes(sp.vendor) ? sp.vendor : "all";
+  const group = sp.group && groups.includes(sp.group) ? sp.group : "all";
 
-  const results = searchCourses({ q, vendor, group });
+  const results = await searchCatalog({ q, vendor, group });
+
   const activeFilters = [
     q && { label: `"${q}"`, href: pathWithout("q", { q, vendor, group }) },
     vendor !== "all" && { label: `Partner: ${vendor}`, href: pathWithout("vendor", { q, vendor, group }) },

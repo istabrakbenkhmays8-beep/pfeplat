@@ -8,7 +8,9 @@ import {
   countByVendor,
   getFeaturedCourses,
   headlineStats,
-} from "@/src/data/queries";
+} from "@/src/repositories/courseRepo";
+
+export const dynamic = "force-dynamic";
 
 const learningFormats = [
   {
@@ -67,11 +69,13 @@ const testimonials = [
   },
 ];
 
-export default function HomePage() {
-  const stats = headlineStats;
-  const vendors = countByVendor().sort((a, b) => b.count - a.count);
-  const groups = countByGroup().sort((a, b) => b.count - a.count);
-  const featured = getFeaturedCourses();
+export default async function HomePage() {
+  const [stats, vendors, groups, featured] = await Promise.all([
+    headlineStats(),
+    countByVendor(),
+    countByGroup(),
+    getFeaturedCourses(8),
+  ]);
 
   return (
     <>

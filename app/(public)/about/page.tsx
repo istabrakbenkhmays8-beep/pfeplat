@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { Container } from "@/components/layout/Container";
 import { KpiCard } from "@/components/ui/KpiCard";
-import { headlineStats } from "@/src/data/queries";
+import { headlineStats } from "@/src/repositories/courseRepo";
 
 export const metadata = { title: "About us" };
+export const dynamic = "force-dynamic";
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const stats = await headlineStats();
   return (
     <>
       <section className="border-b border-border">
@@ -27,8 +29,8 @@ export default function AboutPage() {
           </div>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <KpiCard value={`${headlineStats.yearsOfExperience}+`} label="Years of expertise" />
-            <KpiCard value={`${headlineStats.courses}+`} label="Active courses" />
+            <KpiCard value={`${stats.yearsOfExperience}+`} label="Years of expertise" />
+            <KpiCard value={`${stats.courses}+`} label="Active courses" />
             <KpiCard value="4" label="Countries" hint="Tunisia · Morocco · France · Côte d'Ivoire" />
             <KpiCard value="15+" label="Authorized partners" />
           </div>

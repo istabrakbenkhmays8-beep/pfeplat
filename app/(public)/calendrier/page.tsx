@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { Container } from "@/components/layout/Container";
 import { VendorBadge } from "@/components/ui/VendorBadge";
-import { groupSessionsByWeek, sessionRange } from "@/src/data/queries";
+import { getUpcomingSessionsGroupedByWeek } from "@/src/repositories/courseRepo";
+import { sessionRange } from "@/lib/dates";
+import type { Vendor } from "@/src/data/seed";
 
 export const metadata = { title: "Training calendar" };
+export const dynamic = "force-dynamic";
 
-export default function CalendrierPage() {
-  const weeks = groupSessionsByWeek();
+export default async function CalendrierPage() {
+  const weeks = await getUpcomingSessionsGroupedByWeek();
   const total = weeks.reduce((acc, [, items]) => acc + items.length, 0);
 
   return (
@@ -47,31 +50,32 @@ export default function CalendrierPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {items.map(({ course, start, end }) => (
-                    <tr key={course.code} className="transition hover:bg-muted/40">
-                      <td className="whitespace-nowrap px-4 py-3 font-mono text-xs font-semibold">
-                        {sessionRange(start, end)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <Link
-                          href={`/catalog/${encodeURIComponent(course.code)}`}
-                          className="flex flex-col"
-                        >
-                          <span className="font-medium text-fg hover:text-brand">{course.title}</span>
-                          <span className="text-xs text-muted-foreground">{course.code}</span>
-                        </Link>
-                      </td>
-                      <td className="hidden whitespace-nowrap px-4 py-3 md:table-cell">
-                        <VendorBadge vendor={course.category.vendor} />
-                      </td>
-                      <td className="hidden whitespace-nowrap px-4 py-3 text-xs text-muted-foreground lg:table-cell">
-                        {course.category.group}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3 text-end text-muted-foreground">
-                        {course.durationDays}J
-                      </td>
-                    </tr>
-                  ))}
+                  {items.map((s: any) => {
+                    const course = s.course;
+                    const cat = course.category;
+                    return (
+                      <tr key={String(s._id)} className="transition hover:bg-muted/40">
+                        <td className="whitespace-nowrap px-4 py-3 font-mono text-xs font-semibold">
+                          {sessionRange(new Date(s.startsAt).toISOString(), new Date(s.endsAt).toISOString())}
+                        </td>
+                        <td className="px-4 py-3">
+                          <Link href={`/catalog/${encodeURIComponent(course.code)}`} className="flex flex-col">
+                            <span className="font-medium text-fg hover:text-brand">{course.title}</span>
+                            <span className="text-xs text-muted-foreground">{course.code}</span>
+                          </Link>
+                        </td>
+                        <td className="hidden whitespace-nowrap px-4 py-3 md:table-cell">
+                          <VendorBadge vendor={cat.vendor as Vendor} />
+                        </td>
+                        <td className="hidden whitespace-nowrap px-4 py-3 text-xs text-muted-foreground lg:table-cell">
+                          {cat.group}
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-3 text-end text-muted-foreground">
+                          {course.durationDays}J
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
