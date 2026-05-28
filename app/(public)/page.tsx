@@ -8,6 +8,7 @@ import { VideoHero } from "@/components/home/VideoHero";
 import { LearningFormats } from "@/components/home/LearningFormats";
 import { NetworkMap } from "@/components/home/NetworkMap";
 import { PartnersCarousel } from "@/components/home/PartnersCarousel";
+import { VendorIcon } from "@/components/ui/PartnerMarks";
 import { ZelligeDivider } from "@/components/ui/ZelligeDivider";
 import { Reveal } from "@/components/ui/Reveal";
 import {
@@ -97,10 +98,13 @@ export default async function HomePage() {
               <Link
                 key={v.vendor}
                 href={`/catalog?vendor=${encodeURIComponent(v.vendor)}`}
-                className="group flex items-center justify-between rounded-xl border border-border bg-card p-4 transition hover:-translate-y-0.5 hover:border-brand/50 hover:shadow-sm"
+                className="group flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition hover:-translate-y-0.5 hover:border-brand/50 hover:shadow-sm"
               >
-                <div>
-                  <p className="font-semibold">{v.vendor}</p>
+                <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-surface ring-1 ring-border">
+                  <VendorIcon vendor={v.vendor} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold">{v.vendor}</p>
                   <p className="text-xs text-muted-foreground">{v.count} {v.count === 1 ? "course" : "courses"}</p>
                 </div>
                 <span className="text-muted-foreground group-hover:text-brand" aria-hidden>→</span>
