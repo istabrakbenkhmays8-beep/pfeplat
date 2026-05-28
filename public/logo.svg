@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 40" width="160" height="40" role="img" aria-label="Advancia">
+  <rect x="0" y="4" width="32" height="32" rx="6" fill="#E30613"/>
+  <text x="16" y="26" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="18" fill="#ffffff">A</text>
+  <text x="42" y="26" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="18" fill="currentColor">Advancia</text>
+</svg>

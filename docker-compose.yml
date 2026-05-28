@@ -1,0 +1,31 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: advancia-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-advancia}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-advancia_dev_pw}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-advancia}
+    volumes:
+      - mongo_data:/data/db
+
+  mongo-express:
+    image: mongo-express:1
+    container_name: advancia-mongo-express
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USER:-advancia}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD:-advancia_dev_pw}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_ROOT_USER:-advancia}:${MONGO_ROOT_PASSWORD:-advancia_dev_pw}@mongo:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: ${ME_USER:-admin}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${ME_PASS:-admin}
+
+volumes:
+  mongo_data:

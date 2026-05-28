@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "mongo",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["compose", "up", "mongo"],
+      "port": 27017
+    },
+    {
+      "name": "mongo-express",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["compose", "up", "mongo-express"],
+      "port": 8081
+    }
+  ]
+}
