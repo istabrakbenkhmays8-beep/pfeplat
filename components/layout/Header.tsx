@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Container } from "./Container";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -17,9 +18,17 @@ export function Header({
       <Container size="wide">
         <div className="flex h-16 items-center gap-4">
           {variant === "app" && <MobileNavToggle />}
-          <Link href="/" className="flex items-center gap-2">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-brand text-brand-foreground font-bold">A</span>
-            <span className="font-semibold tracking-tight">Advancia</span>
+          <Link href="/" aria-label="Advancia Training — home" className="flex items-center">
+            <span className="inline-flex items-center rounded-md px-1 py-0.5 dark:bg-white">
+              <Image
+                src="/brand/advancia-logo.png"
+                alt="Advancia Training"
+                width={175}
+                height={64}
+                priority
+                className="h-7 w-auto sm:h-8"
+              />
+            </span>
           </Link>
 
           {variant === "public" && nav.length > 0 && (

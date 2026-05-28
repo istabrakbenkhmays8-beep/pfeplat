@@ -16,15 +16,17 @@ export default function HomePage() {
         <Container size="wide" className="py-16 sm:py-24 lg:py-32">
           <div className="grid items-center gap-12 lg:grid-cols-12">
             <div className="lg:col-span-7">
-              <span className="inline-flex items-center rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted-foreground">
-                Online · On-site · Certified
+              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted-foreground">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand" />
+                Tunisia · Morocco · France · Côte d'Ivoire
               </span>
               <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-                Learn skills that change your career.
+                Boost your career.{" "}
+                <span className="text-brand">Get certified.</span>
               </h1>
               <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-                Online and on-site training, with real certificates and rewards as you progress.
-                Built for everyone — no jargon, just clear learning.
+                Authorized training and certifications from Microsoft, Cisco, Fortinet, EC-Council, PECB,
+                PMI and more. Learn online or on-site, earn rewards as you progress, and get a real certificate.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
@@ -71,14 +73,23 @@ export default function HomePage() {
 
       <section className="border-b border-border">
         <Container size="wide" className="py-16">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Popular categories</h2>
-          <p className="mt-2 text-muted-foreground">Pick a topic and start today.</p>
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Browse by vendor</h2>
+          <p className="mt-2 text-muted-foreground">Official certification tracks across the partners we train for.</p>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {["Tech", "Business", "Design", "Languages"].map((c) => (
-              <div key={c} className="rounded-xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:shadow-md">
+            {[
+              { name: "Microsoft", blurb: "Azure, 365, Power Platform" },
+              { name: "Cisco", blurb: "CCNA · CCNP · DevNet" },
+              { name: "Cybersecurity", blurb: "EC-Council · PECB · Fortinet" },
+              { name: "Project & Agile", blurb: "PMP · Scrum · ITIL" },
+              { name: "Cloud & DevOps", blurb: "AWS · Azure · Linux" },
+              { name: "Data & AI", blurb: "Power BI · Copilot · Azure AI" },
+              { name: "IBM & Togaf", blurb: "AIX · PowerHA · Togaf" },
+              { name: "Office & Productivity", blurb: "365 · SharePoint" },
+            ].map((c) => (
+              <div key={c.name} className="rounded-xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:shadow-md">
                 <div className="mb-3 h-10 w-10 rounded-md bg-brand/10" aria-hidden />
-                <p className="font-semibold">{c}</p>
-                <p className="text-sm text-muted-foreground">Coming soon</p>
+                <p className="font-semibold">{c.name}</p>
+                <p className="text-sm text-muted-foreground">{c.blurb}</p>
               </div>
             ))}
           </div>

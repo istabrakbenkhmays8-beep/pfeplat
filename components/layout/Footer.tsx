@@ -1,47 +1,101 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Container } from "./Container";
+
+type Office = {
+  country: string;
+  lines: string[];
+  email?: string;
+  phone?: string;
+};
+
+const offices: Office[] = [
+  {
+    country: "Tunisia (HQ)",
+    lines: ["Immeuble GlobalNet", "53 Rue des Minéraux", "Charguia 1, Tunis"],
+    email: "service-clients@advancia-training.com",
+    phone: "+216 70 014 078",
+  },
+  {
+    country: "Morocco",
+    lines: ["Bureau 402, Zenith Millenium Immeuble 1", "20190 Sidi Maarouf, Casablanca"],
+    email: "info.maroc@advancia-training.com",
+    phone: "+212 0522 78 98 26",
+  },
+  {
+    country: "France",
+    lines: ["190 rue Topaze", "Éguilles Aix-en-Provence 13510"],
+    email: "info.france@advancia-training.com",
+    phone: "+33 4-24191444",
+  },
+  {
+    country: "Côte d'Ivoire",
+    lines: ["Avenue Dr. Crozet", "Immeuble XL, 7ème étage", "Plateau Abidjan"],
+    email: "info.ci@advancia-training.com",
+    phone: "+225 20 30 92 41",
+  },
+];
 
 export function Footer() {
   const year = new Date().getFullYear();
   return (
     <footer className="border-t border-border bg-surface mt-16">
       <Container size="wide">
-        <div className="grid gap-8 py-12 md:grid-cols-4">
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-brand text-brand-foreground font-bold">A</span>
-              <span className="font-semibold">Advancia Training</span>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Learn online and on-site. Earn coins. Get certified.
+        <div className="grid gap-10 py-12 lg:grid-cols-3">
+          <div className="lg:col-span-1">
+            <span className="inline-flex items-center rounded-md px-1 py-0.5 dark:bg-white">
+              <Image
+                src="/brand/advancia-logo.png"
+                alt="Advancia Training"
+                width={175}
+                height={64}
+                className="h-9 w-auto"
+              />
+            </span>
+            <p className="mt-4 max-w-sm text-sm text-muted-foreground">
+              Boost your career. Get certified. Online and on-site training with real certificates and rewards as you progress.
             </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
+              {["Microsoft Gold", "Cisco Learning", "Fortinet", "EC-Council", "PECB", "PMI"].map((p) => (
+                <span key={p} className="rounded-full border border-border px-2 py-1">{p}</span>
+              ))}
+            </div>
           </div>
-          <div>
-            <h4 className="mb-3 text-sm font-semibold">Explore</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="/catalog" className="hover:text-fg">All courses</Link></li>
-              <li><Link href="/catalog" className="hover:text-fg">Categories</Link></li>
-              <li><Link href="/contact" className="hover:text-fg">Contact us</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="mb-3 text-sm font-semibold">Account</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="/auth/login" className="hover:text-fg">Sign in</Link></li>
-              <li><Link href="/auth/register" className="hover:text-fg">Create account</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="mb-3 text-sm font-semibold">Advancia</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>Tunis, Tunisia</li>
-              <li>contact@advancia.tn</li>
-            </ul>
+
+          <div className="lg:col-span-2">
+            <h4 className="mb-4 text-sm font-semibold">Our offices</h4>
+            <div className="grid gap-6 sm:grid-cols-2">
+              {offices.map((o) => (
+                <div key={o.country}>
+                  <p className="text-sm font-semibold">{o.country}</p>
+                  <ul className="mt-1 space-y-0.5 text-sm text-muted-foreground">
+                    {o.lines.map((l) => (
+                      <li key={l}>{l}</li>
+                    ))}
+                    {o.phone && <li className="pt-1">{o.phone}</li>}
+                    {o.email && (
+                      <li>
+                        <a href={`mailto:${o.email}`} className="hover:text-fg">
+                          {o.email}
+                        </a>
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-        <div className="flex flex-col gap-2 border-t border-border py-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-muted-foreground">© {year} Advancia Training. All rights reserved.</p>
-          <p className="text-xs text-muted-foreground">Made with care in Tunisia.</p>
+
+        <div className="flex flex-col gap-3 border-t border-border py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <p>© {year} Advancia Training. All rights reserved.</p>
+          <div className="flex flex-wrap items-center gap-4">
+            <Link href="/catalog" className="hover:text-fg">Courses</Link>
+            <Link href="/contact" className="hover:text-fg">Contact</Link>
+            <a href="https://www.advancia-training.com" target="_blank" rel="noreferrer" className="hover:text-fg">
+              advancia-training.com
+            </a>
+          </div>
         </div>
       </Container>
     </footer>

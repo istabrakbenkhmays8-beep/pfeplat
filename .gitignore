@@ -52,3 +52,6 @@ public/uploads/
 
 # smoke test artifacts
 .smoke.pid
+
+# unzipped brand source assets (originals live outside the repo)
+_brand-source/
