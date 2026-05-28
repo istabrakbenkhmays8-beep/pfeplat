@@ -6,14 +6,25 @@ import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 
-export function EnrollButton({ courseCode }: { courseCode: string }) {
+export function EnrollButton({
+  courseCode,
+  priceTnd = 0,
+}: {
+  courseCode: string;
+  /** When > 0, button routes to /checkout for paid courses. */
+  priceTnd?: number;
+}) {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [loading, setLoading] = useState(false);
 
   async function onEnroll() {
     if (status === "unauthenticated") {
       router.push(`/auth/login?callbackUrl=${encodeURIComponent(`/catalog/${courseCode}`)}`);
+      return;
+    }
+    if (priceTnd > 0) {
+      router.push(`/checkout?course=${encodeURIComponent(courseCode)}`);
       return;
     }
     setLoading(true);
@@ -43,8 +54,8 @@ export function EnrollButton({ courseCode }: { courseCode: string }) {
   const label =
     status === "unauthenticated"
       ? "Sign in to enroll"
-      : session?.user?.role === "user"
-      ? "Enroll now"
+      : priceTnd > 0
+      ? `Enroll · ${priceTnd.toLocaleString("en-GB")} DT`
       : "Enroll now";
 
   return (

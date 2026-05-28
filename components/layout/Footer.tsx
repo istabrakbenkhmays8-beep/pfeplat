@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Facebook, Instagram, Linkedin, Youtube } from "lucide-react";
 import { Container } from "./Container";
+import { Logo } from "@/components/ui/Logo";
 import { getT } from "@/src/i18n/server";
 
 type Contact = {
@@ -87,15 +87,7 @@ export async function Footer() {
         {/* 4 columns */}
         <div className="grid gap-10 py-12 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <span className="inline-flex items-center rounded-md bg-white px-2 py-1.5">
-              <Image
-                src="/brand/advancia-logo.png"
-                alt="Advancia Training"
-                width={175}
-                height={64}
-                className="h-9 w-auto"
-              />
-            </span>
+            <Logo height={48} className="text-white" />
             <p className="mt-4 max-w-xs text-sm text-white/70">{t.footer.tagline}</p>
           </div>
 

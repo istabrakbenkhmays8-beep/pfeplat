@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { Container } from "./Container";
@@ -7,6 +6,7 @@ import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { MobileNavToggle } from "./MobileNavToggle";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { UserMenu } from "./UserMenu";
+import { Logo } from "@/components/ui/Logo";
 import { getT } from "@/src/i18n/server";
 
 type Nav = { href: string; label: string };
@@ -28,16 +28,7 @@ export async function Header({
         <div className="flex h-16 items-center gap-4">
           {variant === "app" && <MobileNavToggle />}
           <Link href="/" aria-label="Advancia Training — home" className="flex items-center">
-            <span className="inline-flex items-center rounded-md px-1.5 py-1 dark:bg-white">
-              <Image
-                src="/brand/advancia-logo.png"
-                alt="Advancia Training"
-                width={175}
-                height={64}
-                priority
-                className="h-9 w-auto sm:h-10"
-              />
-            </span>
+            <Logo height={40} className="text-fg" />
           </Link>
 
           {variant === "public" && nav.length > 0 && (

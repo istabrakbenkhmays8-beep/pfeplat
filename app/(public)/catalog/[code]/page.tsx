@@ -122,8 +122,13 @@ export default async function CourseDetailPage({ params }: { params: RouteParams
 
                 <hr className="my-5 border-border" />
 
+                {course.priceTnd > 0 && (
+                  <p className="mb-3 text-2xl font-bold">
+                    {course.priceTnd.toLocaleString("en-GB")} <span className="text-base text-muted-foreground">DT</span>
+                  </p>
+                )}
                 <div className="flex flex-col gap-2">
-                  <EnrollButton courseCode={course.code} />
+                  <EnrollButton courseCode={course.code} priceTnd={course.priceTnd} />
                   <Link href="/contact" className="inline-flex h-11 w-full items-center justify-center rounded-md border border-border bg-surface text-sm font-semibold text-fg hover:bg-muted">
                     Request a quote
                   </Link>

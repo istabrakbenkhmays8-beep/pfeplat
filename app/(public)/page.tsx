@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/layout/Container";
 import { KpiCard } from "@/components/ui/KpiCard";
@@ -22,18 +23,21 @@ const testimonials = [
       "The trainer was exceptional. I left with practical confidence and passed the certification on first attempt.",
     name: "Yacine B.",
     role: "Cloud engineer · AZ-104 alumni",
+    avatar: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=160&h=160&q=80&auto=format&fit=crop&crop=faces",
   },
   {
     quote:
       "Best ROI we've had on training in years. Our SOC team is operational on day one after the bootcamp.",
     name: "Sarra K.",
     role: "CISO · Banking sector",
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=160&h=160&q=80&auto=format&fit=crop&crop=faces",
   },
   {
     quote:
       "Hybrid sessions made it work for a distributed team across 3 countries. Highly recommended.",
     name: "Mohamed A.",
     role: "Head of IT · Telco",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&h=160&q=80&auto=format&fit=crop&crop=faces",
   },
 ];
 
@@ -158,9 +162,14 @@ export default async function HomePage() {
                   <path d="M9.17 6C5.7 7.83 3 11.5 3 16h6V6H9.17zm12 0c-3.47 1.83-6.17 5.5-6.17 10h6V6h.17z" />
                 </svg>
                 <blockquote className="mt-3 text-sm leading-relaxed text-fg">&ldquo;{tt.quote}&rdquo;</blockquote>
-                <figcaption className="mt-4">
-                  <p className="text-sm font-semibold">{tt.name}</p>
-                  <p className="text-xs text-muted-foreground">{tt.role}</p>
+                <figcaption className="mt-4 flex items-center gap-3">
+                  <span className="relative h-11 w-11 overflow-hidden rounded-full ring-2 ring-brand/30">
+                    <Image src={tt.avatar} alt="" fill sizes="44px" className="object-cover" />
+                  </span>
+                  <span>
+                    <p className="text-sm font-semibold">{tt.name}</p>
+                    <p className="text-xs text-muted-foreground">{tt.role}</p>
+                  </span>
                 </figcaption>
               </figure>
             ))}

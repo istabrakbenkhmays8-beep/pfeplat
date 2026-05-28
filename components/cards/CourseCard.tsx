@@ -1,27 +1,37 @@
+import Image from "next/image";
 import Link from "next/link";
 import { VendorBadge } from "@/components/ui/VendorBadge";
 import { sessionRange } from "@/lib/dates";
+import { courseImageFor } from "@/lib/courseImage";
 import type { CatalogCourse } from "@/src/repositories/courseRepo";
 import type { Vendor } from "@/src/data/seed";
 
 export function CourseCard({ course }: { course: CatalogCourse }) {
   const href = `/catalog/${encodeURIComponent(course.code)}`;
+  const imgUrl = courseImageFor(course.category.vendor, 800);
+
   return (
     <Link
       href={href}
       className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card transition hover:-translate-y-0.5 hover:border-brand/50 hover:shadow-md"
     >
-      <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-brand/15 via-transparent to-muted">
+      <div className="relative aspect-[16/9] overflow-hidden bg-muted">
+        <Image
+          src={imgUrl}
+          alt=""
+          fill
+          sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
+          className="object-cover transition group-hover:scale-105"
+        />
+        {/* Dark gradient bottom for legibility of the code */}
         <div
           aria-hidden
-          className="absolute inset-0 opacity-60"
-          style={{
-            background:
-              "radial-gradient(20rem 12rem at 20% 0%, color-mix(in oklab, var(--color-brand) 30%, transparent), transparent), radial-gradient(20rem 12rem at 100% 100%, color-mix(in oklab, var(--color-brand) 18%, transparent), transparent)",
-          }}
+          className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"
         />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-mono text-2xl font-bold tracking-wider text-fg/80">{course.code}</span>
+        <div className="absolute inset-x-0 bottom-3 flex items-center justify-center">
+          <span className="font-mono text-2xl font-bold tracking-wider text-white drop-shadow-md">
+            {course.code}
+          </span>
         </div>
         <div className="absolute start-3 top-3">
           <VendorBadge vendor={course.category.vendor as Vendor} />

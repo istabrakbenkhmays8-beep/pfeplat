@@ -1,6 +1,16 @@
 import Link from "next/link";
 import { connectDb } from "@/lib/db";
 import { Course, Enrollment, Session, User } from "@/src/models";
+import {
+  coursesByGroup,
+  coursesByVendor,
+  enrollmentTrend,
+} from "@/src/repositories/analyticsRepo";
+import {
+  CoursesByGroupChart,
+  CoursesByVendorChart,
+  EnrollmentTrendChart,
+} from "@/components/admin/AdminCharts";
 
 export const metadata = { title: "Admin overview" };
 export const dynamic = "force-dynamic";
@@ -10,14 +20,25 @@ export default async function AdminOverviewPage() {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [activeLearners, coursesCount, sessionsThisMonth, completionsThisMonth, totalEnrollments] =
-    await Promise.all([
-      User.countDocuments({ role: "user", status: "active" }),
-      Course.countDocuments({ isPublished: true }),
-      Session.countDocuments({ startsAt: { $gte: startOfMonth } }),
-      Enrollment.countDocuments({ status: "completed", completedAt: { $gte: startOfMonth } }),
-      Enrollment.countDocuments({}),
-    ]);
+  const [
+    activeLearners,
+    coursesCount,
+    sessionsThisMonth,
+    completionsThisMonth,
+    totalEnrollments,
+    trend,
+    byVendor,
+    byGroup,
+  ] = await Promise.all([
+    User.countDocuments({ role: "user", status: "active" }),
+    Course.countDocuments({ isPublished: true }),
+    Session.countDocuments({ startsAt: { $gte: startOfMonth } }),
+    Enrollment.countDocuments({ status: "completed", completedAt: { $gte: startOfMonth } }),
+    Enrollment.countDocuments({}),
+    enrollmentTrend(),
+    coursesByVendor(),
+    coursesByGroup(),
+  ]);
 
   const completionRate =
     totalEnrollments === 0
@@ -45,6 +66,15 @@ export default async function AdminOverviewPage() {
         <Kpi label="Sessions this month" value={sessionsThisMonth} hint="Live + on-site" />
         <Kpi label="Completion rate" value={`${completionRate}%`} hint="All time" />
       </div>
+
+      <section className="grid gap-4 lg:grid-cols-2">
+        <EnrollmentTrendChart data={trend} />
+        <CoursesByGroupChart data={byGroup} />
+      </section>
+
+      <section>
+        <CoursesByVendorChart data={byVendor} />
+      </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-xl border border-border bg-card p-5">

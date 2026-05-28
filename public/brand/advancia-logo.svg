@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 88" role="img" aria-label="Advancia Training">
+  <title>Advancia Training</title>
+  <!-- Red circle mark -->
+  <g transform="translate(8 8)">
+    <circle cx="36" cy="36" r="34" fill="none" stroke="#C70019" stroke-width="4" />
+    <!-- Inner red disc with the play notch -->
+    <path
+      d="M36 8
+         a28 28 0 1 1 0 56
+         a28 28 0 1 1 0 -56
+         M28 22
+         L52 36
+         L28 50
+         Z"
+      fill="#C70019"
+      fill-rule="evenodd"
+    />
+  </g>
+
+  <!-- ADVANCIA wordmark -->
+  <g transform="translate(96 0)">
+    <text
+      x="0"
+      y="50"
+      font-family="Inter, Helvetica, Arial, sans-serif"
+      font-weight="900"
+      font-size="44"
+      letter-spacing="-1"
+      fill="currentColor"
+    >ADVANCIA</text>
+    <!-- Registered mark -->
+    <circle cx="222" cy="20" r="6" fill="none" stroke="currentColor" stroke-width="1.5" />
+    <text
+      x="222"
+      y="24"
+      text-anchor="middle"
+      font-family="Inter, Helvetica, Arial, sans-serif"
+      font-size="7"
+      font-weight="700"
+      fill="currentColor"
+    >R</text>
+
+    <!-- TRAINING subtitle, spaced -->
+    <text
+      x="0"
+      y="76"
+      font-family="Inter, Helvetica, Arial, sans-serif"
+      font-weight="500"
+      font-size="13"
+      letter-spacing="9"
+      fill="currentColor"
+    >TRAINING</text>
+  </g>
+</svg>
