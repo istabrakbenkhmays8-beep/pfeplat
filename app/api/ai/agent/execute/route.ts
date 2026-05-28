@@ -13,6 +13,10 @@ const schema = z.object({
     description: z.string(),
     input: z.record(z.unknown()),
     resumeContext: z.array(z.unknown()),
+    // `provider` was added when the agent gained Groq support. Older proposals
+    // (created before this field existed) default to the current AI_PROVIDER at
+    // execution time inside agentService, so the field stays optional here.
+    provider: z.enum(["groq", "anthropic"]).optional(),
   }),
 });
 

@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     return Response.json(
       {
         error: "AINotConfigured",
-        message: "Set ANTHROPIC_API_KEY in .env to enable the assistant.",
+        message: "Set AI_API_KEY in .env to enable the assistant (Groq: gsk_..., Anthropic: sk-ant-...).",
       },
       { status: 503 },
     );
@@ -80,14 +80,15 @@ export async function POST(req: Request) {
           encoder.encode(`event: meta\ndata: ${JSON.stringify({ conversationId: String(convo._id) })}\n\n`),
         );
 
+        // streamChat now yields a normalized `{ text }` shape regardless of provider
+        // (Groq or Anthropic), so the route handler is provider-agnostic.
         for await (const chunk of stream) {
-          if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") {
-            const piece = chunk.delta.text;
-            assistantText += piece;
-            controller.enqueue(
-              encoder.encode(`event: token\ndata: ${JSON.stringify({ token: piece })}\n\n`),
-            );
-          }
+          const piece = chunk.text;
+          if (!piece) continue;
+          assistantText += piece;
+          controller.enqueue(
+            encoder.encode(`event: token\ndata: ${JSON.stringify({ token: piece })}\n\n`),
+          );
         }
 
         // Persist the assistant message at the end.

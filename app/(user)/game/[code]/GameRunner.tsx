@@ -1,270 +1,511 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
-import toast from "react-hot-toast";
-import { Check, Loader2, Sparkles, X } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { ArrowUp, Pause, Play, RotateCcw } from "lucide-react";
+import type { Game } from "@/src/data/games";
 
-type Game = {
-  code: string;
-  title: string;
-  intro: string;
-  challenges: Array<{
-    idx: number;
-    prompt: string;
-    options: Array<{ idx: number; text: string }>;
-    correctIdx: number;
-    reveal: string;
-  }>;
+type RunnerStatus = "idle" | "playing" | "paused" | "gameover";
+
+type Obstacle = {
+  id: number;
+  x: number;
+  width: number;
+  height: number;
+  label: string;
+  passed: boolean;
 };
 
-type Phase = "intro" | "answering" | "feedback" | "done";
+type RunnerState = {
+  status: RunnerStatus;
+  heroLift: number;
+  heroVelocity: number;
+  obstacles: Obstacle[];
+  score: number;
+  bestScore: number;
+  lives: number;
+  dodged: number;
+  speed: number;
+};
+
+type TrackTheme = {
+  heroName: string;
+  coachLine: string;
+  sky: string;
+  skyline: string;
+  chip: string;
+  heroSuit: string;
+  heroCape: string;
+  floorGlow: string;
+  problemLabels: string[];
+};
+
+const TRACKS: Record<string, TrackTheme> = {
+  CCNA: {
+    heroName: "Lina",
+    coachLine: "Network day is busy. Help Lina jump over packet loss, loops, and broken DNS.",
+    sky: "from-sky-200 via-cyan-100 to-white dark:from-sky-950 dark:via-slate-950 dark:to-slate-900",
+    skyline: "bg-sky-500/15 dark:bg-sky-400/10",
+    chip: "bg-sky-100 text-sky-900 dark:bg-sky-500/20 dark:text-sky-200",
+    heroSuit: "from-sky-500 to-cyan-400",
+    heroCape: "bg-brand",
+    floorGlow: "from-sky-500/35 via-sky-500/5 to-transparent",
+    problemLabels: ["Packet loss", "DNS", "Loop", "Timeout", "Wrong subnet", "Slow link"],
+  },
+  "AZ-104": {
+    heroName: "Yassine",
+    coachLine: "Cloud tasks keep coming. Help Yassine leap over drift, latency, and quota limits.",
+    sky: "from-blue-200 via-indigo-100 to-white dark:from-blue-950 dark:via-slate-950 dark:to-slate-900",
+    skyline: "bg-blue-500/15 dark:bg-blue-400/10",
+    chip: "bg-blue-100 text-blue-900 dark:bg-blue-500/20 dark:text-blue-200",
+    heroSuit: "from-blue-500 to-indigo-400",
+    heroCape: "bg-brand",
+    floorGlow: "from-blue-500/35 via-blue-500/5 to-transparent",
+    problemLabels: ["Quota limit", "Latency", "Drift", "Outage", "Access block", "Retry storm"],
+  },
+  ISO27001LI: {
+    heroName: "Sami",
+    coachLine: "Security alerts never sleep. Help Sami dodge phishing, leaks, and risky shortcuts.",
+    sky: "from-rose-200 via-orange-100 to-white dark:from-rose-950 dark:via-slate-950 dark:to-slate-900",
+    skyline: "bg-rose-500/15 dark:bg-rose-400/10",
+    chip: "bg-rose-100 text-rose-900 dark:bg-rose-500/20 dark:text-rose-200",
+    heroSuit: "from-rose-500 to-orange-400",
+    heroCape: "bg-brand",
+    floorGlow: "from-rose-500/35 via-rose-500/5 to-transparent",
+    problemLabels: ["Phishing", "Leak", "Weak password", "Malware", "Shadow app", "Missed update"],
+  },
+};
+
+const DEFAULT_TRACK: TrackTheme = {
+  heroName: "Nour",
+  coachLine: "A quick learning break. Dodge the problems, stay light on your feet, and beat your best score.",
+  sky: "from-zinc-200 via-stone-100 to-white dark:from-zinc-900 dark:via-slate-950 dark:to-slate-900",
+  skyline: "bg-zinc-500/15 dark:bg-zinc-400/10",
+  chip: "bg-brand/10 text-brand",
+  heroSuit: "from-zinc-700 to-zinc-500",
+  heroCape: "bg-brand",
+  floorGlow: "from-brand/35 via-brand/5 to-transparent",
+  problemLabels: ["Delay", "Bug", "Noise", "Stress", "Rush job", "Confusion"],
+};
+
+const START_LIVES = 3;
+const BASE_SPEED = 7.2;
+const MAX_SPEED = 14.5;
+const JUMP_FORCE = 14.5;
+const GRAVITY = 0.88;
+const HERO_X = 112;
+const HERO_SIZE = 58;
+
+function makeInitialState(bestScore = 0): RunnerState {
+  return {
+    status: "idle",
+    heroLift: 0,
+    heroVelocity: 0,
+    obstacles: [],
+    score: 0,
+    bestScore,
+    lives: START_LIVES,
+    dodged: 0,
+    speed: BASE_SPEED,
+  };
+}
+
+function clampDelta(deltaMs: number) {
+  return Math.min(34, Math.max(10, deltaMs));
+}
 
 export function GameRunner({ game }: { game: Game }) {
-  const router = useRouter();
-  const [phase, setPhase] = useState<Phase>("intro");
-  const [step, setStep] = useState(0);
-  const [pick, setPick] = useState<number | null>(null);
-  const [score, setScore] = useState(0);
-  const [busy, setBusy] = useState(false);
+  const track = TRACKS[game.code] ?? DEFAULT_TRACK;
+  const bestKey = `advancia-runner-best:${game.code}`;
 
-  const total = game.challenges.length;
-  const current = game.challenges[step];
+  const [runner, setRunner] = useState<RunnerState>(() => makeInitialState());
 
-  function answer(optionIdx: number) {
-    if (phase !== "answering") return;
-    setPick(optionIdx);
-    if (optionIdx === current.correctIdx) {
-      setScore((s) => s + 1);
+  const frameRef = useRef<number | null>(null);
+  const lastFrameRef = useRef<number | null>(null);
+  const spawnInRef = useRef(900);
+  const obstacleIdRef = useRef(1);
+  const damageUntilRef = useRef(0);
+  const bestScoreRef = useRef(0);
+  const runnerRef = useRef(runner);
+
+  useEffect(() => {
+    runnerRef.current = runner;
+  }, [runner]);
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(bestKey);
+    const best = stored ? Number(stored) : 0;
+    if (Number.isFinite(best) && best > 0) {
+      bestScoreRef.current = best;
+      setRunner((prev) => ({ ...prev, bestScore: best }));
     }
-    setPhase("feedback");
+  }, [bestKey]);
+
+  function saveBest(score: number) {
+    if (score <= bestScoreRef.current) return;
+    bestScoreRef.current = score;
+    window.localStorage.setItem(bestKey, String(score));
   }
 
-  async function next() {
-    if (step + 1 < total) {
-      setStep((s) => s + 1);
-      setPick(null);
-      setPhase("answering");
+  function startGame() {
+    lastFrameRef.current = null;
+    spawnInRef.current = 850;
+    obstacleIdRef.current = 1;
+    damageUntilRef.current = 0;
+    setRunner({
+      ...makeInitialState(bestScoreRef.current),
+      status: "playing",
+    });
+  }
+
+  function togglePause() {
+    setRunner((prev) => {
+      if (prev.status === "playing") return { ...prev, status: "paused" };
+      if (prev.status === "paused") return { ...prev, status: "playing" };
+      return prev;
+    });
+  }
+
+  function jump() {
+    setRunner((prev) => {
+      if (prev.status === "idle") {
+        return { ...makeInitialState(bestScoreRef.current), status: "playing", heroVelocity: JUMP_FORCE };
+      }
+      if (prev.status !== "playing" || prev.heroLift > 0.5) return prev;
+      return {
+        ...prev,
+        heroVelocity: JUMP_FORCE,
+      };
+    });
+  }
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.code === "Space" || event.code === "ArrowUp" || event.code === "KeyW") {
+        event.preventDefault();
+        jump();
+      } else if (event.code === "KeyP" || event.code === "Escape") {
+        event.preventDefault();
+        togglePause();
+      } else if (event.code === "Enter" && runnerRef.current.status === "gameover") {
+        event.preventDefault();
+        startGame();
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  });
+
+  useEffect(() => {
+    if (runner.status !== "playing") {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+      frameRef.current = null;
+      lastFrameRef.current = null;
       return;
     }
-    // Last step → submit completion.
-    setBusy(true);
-    try {
-      const res = await fetch(`/api/game/${encodeURIComponent(game.code)}/complete`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ score, total }),
-      });
-      const body = await res.json();
-      if (res.ok && body.coinsAwarded > 0) {
-        toast.success(`+${body.coinsAwarded} coins!`);
-      }
-      setPhase("done");
-      router.refresh();
-    } finally {
-      setBusy(false);
-    }
-  }
 
-  if (phase === "intro") {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="rounded-2xl border border-border bg-card p-8 text-center shadow-sm"
-      >
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1, rotate: [0, -15, 15, 0] }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-brand text-brand-foreground"
-        >
-          <Sparkles className="h-8 w-8" />
-        </motion.div>
-        <p className="mt-3 text-xs font-semibold uppercase tracking-widest text-brand">
-          Game challenge · {game.code}
-        </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight">{game.title}</h1>
-        <p className="mt-3 text-sm text-muted-foreground">{game.intro}</p>
-        <p className="mt-4 text-xs text-muted-foreground">
-          {total} challenges · pass at 70% to earn coins
-        </p>
-        <button
-          type="button"
-          onClick={() => setPhase("answering")}
-          className="mt-6 inline-flex h-12 items-center rounded-md bg-brand px-8 text-sm font-semibold text-brand-foreground transition hover:bg-brand-600"
-        >
-          Start the game →
-        </button>
-      </motion.div>
-    );
-  }
+    const tick = (time: number) => {
+      const previousTime = lastFrameRef.current ?? time;
+      lastFrameRef.current = time;
+      const deltaMs = clampDelta(time - previousTime);
+      const deltaUnit = deltaMs / 16.67;
 
-  if (phase === "done") {
-    const pct = total === 0 ? 0 : Math.round((score / total) * 100);
-    const passed = pct >= 70;
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.92 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-        className={
-          passed
-            ? "rounded-2xl border border-success/40 bg-success/10 p-10 text-center"
-            : "rounded-2xl border border-warning/40 bg-warning/10 p-10 text-center"
+      setRunner((prev) => {
+        if (prev.status !== "playing") return prev;
+
+        let heroVelocity = prev.heroVelocity - GRAVITY * deltaUnit;
+        let heroLift = prev.heroLift + heroVelocity * deltaUnit;
+        if (heroLift <= 0) {
+          heroLift = 0;
+          heroVelocity = 0;
         }
-      >
-        <motion.div
-          initial={{ scale: 0, rotate: -45 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ duration: 0.5, ease: "backOut" }}
-          className={
-            passed
-              ? "mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-success text-white"
-              : "mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-warning text-white"
-          }
-        >
-          {passed ? <Check className="h-10 w-10" /> : <X className="h-10 w-10" />}
-        </motion.div>
-        <p className="mt-4 text-xs font-semibold uppercase tracking-widest">{passed ? "Crushed it" : "Almost there"}</p>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mt-1 text-6xl font-bold"
-        >
-          {pct}%
-        </motion.p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          You answered {score} of {total} correctly.
-        </p>
-        <div className="mt-6 flex justify-center gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              setStep(0);
-              setPick(null);
-              setScore(0);
-              setPhase("answering");
-            }}
-            className="inline-flex h-10 items-center rounded-md border border-border bg-surface px-4 text-sm font-medium hover:bg-muted"
-          >
-            Play again
-          </button>
-          <a
-            href="/my-courses"
-            className="inline-flex h-10 items-center rounded-md bg-brand px-4 text-sm font-semibold text-brand-foreground hover:bg-brand-600"
-          >
-            My courses
-          </a>
-        </div>
-      </motion.div>
-    );
-  }
 
-  // Answering / feedback
-  const pct = ((step + (phase === "feedback" ? 1 : 0)) / total) * 100;
+        let score = prev.score + deltaMs * 0.03;
+        const speed = Math.min(MAX_SPEED, prev.speed + deltaMs * 0.0018);
+        let dodged = prev.dodged;
+        let lives = prev.lives;
+        let status: RunnerStatus = prev.status;
+
+        spawnInRef.current -= deltaMs;
+        let nextObstacles = prev.obstacles.map((obstacle) => ({
+          ...obstacle,
+          x: obstacle.x - speed * deltaUnit,
+        }));
+
+        if (spawnInRef.current <= 0) {
+          const labels = track.problemLabels;
+          const label = labels[Math.floor(Math.random() * labels.length)];
+          nextObstacles.push({
+            id: obstacleIdRef.current++,
+            x: 940,
+            width: 72 + Math.random() * 18,
+            height: 44 + Math.random() * 54,
+            label,
+            passed: false,
+          });
+          spawnInRef.current = Math.max(520, 1150 - Math.min(score * 2.2, 420)) + Math.random() * 450;
+        }
+
+        const heroRight = HERO_X + HERO_SIZE;
+        const now = time;
+        const canTakeDamage = now >= damageUntilRef.current;
+
+        nextObstacles = nextObstacles
+          .filter((obstacle) => obstacle.x + obstacle.width > -80)
+          .map((obstacle) => {
+            if (!obstacle.passed && obstacle.x + obstacle.width < HERO_X) {
+              score += 18;
+              dodged += 1;
+              return { ...obstacle, passed: true };
+            }
+            return obstacle;
+          });
+
+        for (const obstacle of nextObstacles) {
+          const overlapX = HERO_X < obstacle.x + obstacle.width - 10 && heroRight > obstacle.x + 10;
+          const overlapY = heroLift < obstacle.height - 4;
+          if (overlapX && overlapY && canTakeDamage) {
+            lives -= 1;
+            damageUntilRef.current = now + 850;
+            nextObstacles = nextObstacles.filter((item) => item.id !== obstacle.id);
+            if (lives <= 0) {
+              status = "gameover";
+            }
+            break;
+          }
+        }
+
+        const roundedScore = Math.max(0, Math.floor(score));
+        const bestScore = Math.max(prev.bestScore, roundedScore);
+        if (bestScore > prev.bestScore) {
+          saveBest(bestScore);
+        }
+
+        return {
+          status,
+          heroLift,
+          heroVelocity,
+          obstacles: nextObstacles,
+          score: roundedScore,
+          bestScore,
+          lives,
+          dodged,
+          speed,
+        };
+      });
+
+      frameRef.current = requestAnimationFrame(tick);
+    };
+
+    frameRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+      frameRef.current = null;
+    };
+    // saveBest only reads/writes refs and is safe to capture; re-adding it as a
+    // dep would tear down the requestAnimationFrame loop on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [runner.status, track.problemLabels]);
 
   return (
-    <div className="space-y-4">
-      {/* Progress bar */}
-      <div className="flex items-center gap-3">
-        <div className="flex-1 h-2 overflow-hidden rounded-full bg-muted">
-          <motion.div
-            className="h-full bg-brand"
-            initial={{ width: 0 }}
-            animate={{ width: `${pct}%` }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+    <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="overflow-hidden rounded-[28px] border border-border bg-card shadow-sm">
+        <div className={`relative overflow-hidden bg-gradient-to-b ${track.sky}`} style={{ minHeight: 420 }}>
+          <div className="absolute inset-x-0 top-5 flex justify-between px-6 text-xs font-semibold text-muted-foreground">
+            <span className={`rounded-full px-3 py-1 ${track.chip}`}>{game.code} run</span>
+            <span className="rounded-full border border-white/40 bg-white/70 px-3 py-1 text-slate-700 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-200">
+              Pause anytime
+            </span>
+          </div>
+
+          <div aria-hidden className="absolute inset-x-0 bottom-16 flex items-end gap-4 px-6 opacity-80">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div
+                key={index}
+                className={`rounded-t-3xl ${track.skyline}`}
+                style={{
+                  width: `${48 + (index % 3) * 18}px`,
+                  height: `${70 + ((index * 29) % 110)}px`,
+                }}
+              />
+            ))}
+          </div>
+
+          <div
+            aria-hidden
+            className={`absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t ${track.floorGlow}`}
           />
+          <div aria-hidden className="absolute inset-x-0 bottom-0 h-16 bg-[#171717] dark:bg-black" />
+          <div aria-hidden className="absolute inset-x-0 bottom-12 h-1 bg-white/60 dark:bg-white/10" />
+
+          <div className="absolute left-6 top-16 max-w-sm rounded-2xl border border-white/40 bg-white/80 p-4 shadow-sm backdrop-blur dark:border-white/10 dark:bg-slate-950/70">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">Hero mission</p>
+            <h2 className="mt-2 text-xl font-bold">{track.heroName}'s quick break run</h2>
+            <p className="mt-2 text-sm text-muted-foreground">{track.coachLine}</p>
+          </div>
+
+          <div
+            className="absolute bottom-16 left-[112px] z-10 transition-transform duration-75"
+            style={{ transform: `translateY(${-runner.heroLift}px)` }}
+          >
+            <div className="relative h-[58px] w-[58px]">
+              <div className="absolute left-4 top-0 h-5 w-5 rounded-full bg-amber-200 shadow-sm" />
+              <div className={`absolute left-2 top-5 h-8 w-10 rounded-2xl bg-gradient-to-b ${track.heroSuit} shadow-lg`} />
+              <div className={`absolute left-0 top-7 h-3 w-4 rounded-full ${track.heroCape} opacity-90`} />
+              <div className="absolute left-2 top-[52px] h-2 w-2 rounded-full bg-card" />
+              <div className="absolute left-8 top-[52px] h-2 w-2 rounded-full bg-card" />
+            </div>
+          </div>
+
+          {runner.obstacles.map((obstacle) => (
+            <div
+              key={obstacle.id}
+              className="absolute bottom-16 z-10 flex items-end"
+              style={{ transform: `translateX(${obstacle.x}px)` }}
+            >
+              <div
+                className="flex items-end rounded-2xl border border-black/10 bg-slate-900/95 px-3 pb-3 pt-2 text-[11px] font-semibold text-white shadow-xl dark:border-white/10"
+                style={{ width: obstacle.width, height: obstacle.height }}
+              >
+                <span className="leading-tight">{obstacle.label}</span>
+              </div>
+            </div>
+          ))}
+
+          {(runner.status === "idle" || runner.status === "paused" || runner.status === "gameover") && (
+            <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-950/35 p-6 backdrop-blur-[2px]">
+              <div className="w-full max-w-md rounded-3xl border border-white/30 bg-white/92 p-6 text-center shadow-2xl dark:border-white/10 dark:bg-slate-950/92">
+                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+                  {runner.status === "idle"
+                    ? "Ready"
+                    : runner.status === "paused"
+                    ? "Paused"
+                    : "Run complete"}
+                </p>
+                <h3 className="mt-2 text-2xl font-bold">
+                  {runner.status === "idle"
+                    ? "Start the run"
+                    : runner.status === "paused"
+                    ? "Take your time"
+                    : "Nice work"}
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {runner.status === "idle"
+                    ? "Jump over the problems, keep your lives, and build the highest score you can."
+                    : runner.status === "paused"
+                    ? "Resume whenever you are ready. Your score and lives will stay exactly where you left them."
+                    : `You dodged ${runner.dodged} problems and reached ${runner.score} points.`}
+                </p>
+                <div className="mt-5 flex flex-wrap justify-center gap-3">
+                  {runner.status !== "paused" ? (
+                    <button
+                      type="button"
+                      onClick={startGame}
+                      className="inline-flex h-11 items-center justify-center rounded-full bg-brand px-5 text-sm font-semibold text-brand-foreground hover:bg-brand-600"
+                    >
+                      {runner.status === "gameover" ? "Play again" : "Start now"}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={togglePause}
+                      className="inline-flex h-11 items-center justify-center rounded-full bg-brand px-5 text-sm font-semibold text-brand-foreground hover:bg-brand-600"
+                    >
+                      Resume run
+                    </button>
+                  )}
+                  {runner.status === "gameover" ? (
+                    <Link
+                      href="/games"
+                      className="inline-flex h-11 items-center justify-center rounded-full border border-border bg-card px-5 text-sm font-semibold text-fg hover:border-brand/40 hover:text-brand"
+                    >
+                      Try another game
+                    </Link>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-        <p className="text-xs font-mono font-semibold text-muted-foreground">
-          {step + 1} / {total}
-        </p>
+
+        <div className="grid gap-3 border-t border-border bg-card p-4 sm:grid-cols-[1fr_auto_auto] sm:items-center">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <StatCard label="Score" value={String(runner.score)} />
+            <StatCard label="Best" value={String(runner.bestScore)} />
+            <StatCard label="Lives" value={String(runner.lives)} />
+            <StatCard label="Dodged" value={String(runner.dodged)} />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={jump}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-brand px-4 text-sm font-semibold text-brand-foreground hover:bg-brand-600"
+            >
+              <ArrowUp className="h-4 w-4" />
+              Jump
+            </button>
+            <button
+              type="button"
+              onClick={togglePause}
+              disabled={runner.status === "idle" || runner.status === "gameover"}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-semibold text-fg hover:border-brand/40 hover:text-brand disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {runner.status === "paused" ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+              {runner.status === "paused" ? "Resume" : "Pause"}
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={startGame}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-semibold text-fg hover:border-brand/40 hover:text-brand"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Restart
+          </button>
+        </div>
       </div>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={step + (phase === "feedback" ? "-fb" : "-q")}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.25 }}
-          className="rounded-2xl border border-border bg-card p-6 shadow-sm"
-        >
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Challenge {step + 1}
-          </p>
-          <h2 className="mt-2 text-xl font-bold">{current.prompt}</h2>
-
-          <ul className="mt-5 space-y-2">
-            {current.options.map((o) => {
-              const isPick = pick === o.idx;
-              const isCorrect = o.idx === current.correctIdx;
-              const reveal = phase === "feedback";
-              const tone = reveal
-                ? isCorrect
-                  ? "border-success bg-success/10 text-fg"
-                  : isPick
-                  ? "border-danger bg-danger/10 text-fg"
-                  : "border-border bg-card text-muted-foreground"
-                : isPick
-                ? "border-brand bg-brand/5 text-fg"
-                : "border-border bg-surface text-fg hover:bg-muted";
-              return (
-                <motion.li key={o.idx} whileTap={{ scale: 0.98 }}>
-                  <button
-                    type="button"
-                    disabled={phase === "feedback"}
-                    onClick={() => answer(o.idx)}
-                    className={`flex w-full items-center justify-between gap-3 rounded-md border px-4 py-3 text-sm transition ${tone}`}
-                  >
-                    <span>{o.text}</span>
-                    {reveal && isCorrect && <Check className="h-4 w-4 text-success" />}
-                    {reveal && !isCorrect && isPick && <X className="h-4 w-4 text-danger" />}
-                  </button>
-                </motion.li>
-              );
-            })}
+      <aside className="space-y-4">
+        <div className="rounded-3xl border border-border bg-card p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">Quick tips</p>
+          <ul className="mt-3 space-y-3 text-sm text-muted-foreground">
+            <li>Start with one clean jump. The hero can jump again only after landing.</li>
+            <li>Each problem you clear boosts your score, so timing matters more than speed.</li>
+            <li>Use Pause whenever you want a short break in the middle of the run.</li>
           </ul>
+        </div>
 
-          <AnimatePresence>
-            {phase === "feedback" && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="overflow-hidden"
-              >
-                <div className="mt-5 rounded-lg border border-border bg-muted/40 p-4 text-sm">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-brand">
-                    {pick === current.correctIdx ? "Correct" : "Heads up"}
-                  </p>
-                  <p className="mt-1 leading-relaxed">{current.reveal}</p>
-                </div>
+        <div className="rounded-3xl border border-border bg-card p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">Problem list</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {track.problemLabels.map((label) => (
+              <span key={label} className={`rounded-full px-3 py-1 text-xs font-semibold ${track.chip}`}>
+                {label}
+              </span>
+            ))}
+          </div>
+        </div>
 
-                <div className="mt-4 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={next}
-                    disabled={busy}
-                    className="inline-flex h-10 items-center gap-2 rounded-md bg-brand px-6 text-sm font-semibold text-brand-foreground transition hover:bg-brand-600 disabled:opacity-60"
-                  >
-                    {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-                    {step + 1 < total ? "Next challenge →" : "See your score"}
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      </AnimatePresence>
+        <div className="rounded-3xl border border-border bg-card p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">Why this helps</p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Short games make the platform feel lighter. A quick run gives the user a break, a small challenge, and a reason
+            to come back for one more score.
+          </p>
+        </div>
+      </aside>
+    </section>
+  );
+}
 
-      <p className="text-center text-xs text-muted-foreground">
-        Score so far: {score} / {step + (phase === "feedback" ? 1 : 0)}
-      </p>
+function StatCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-border bg-surface px-3 py-2">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">{label}</p>
+      <p className="mt-1 text-lg font-bold">{value}</p>
     </div>
   );
 }

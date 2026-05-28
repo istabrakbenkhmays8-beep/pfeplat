@@ -4,9 +4,15 @@ import { Types } from "mongoose";
 import { connectDb } from "@/lib/db";
 import { env } from "@/lib/env";
 import { EmailToken, User } from "@/src/models";
-import { renderEmail, sendMail } from "./emailService";
+import { sendPasswordResetEmail } from "./emailTemplates";
 
 const RESET_TTL_MS = 30 * 60 * 1000; // 30 minutes
+
+type StartResetResult = {
+  ok: true;
+  delivered: boolean;
+  previewResetLink?: string;
+};
 
 function sha256(s: string): string {
   return crypto.createHash("sha256").update(s).digest("hex");
@@ -15,9 +21,9 @@ function sha256(s: string): string {
 /**
  * Begin a password reset. Always returns ok=true even if the email isn't on file
  * (no enumeration). When the email IS on file we issue a hashed token and email
- * a /reset-password link.
+ * an /auth/reset-password link.
  */
-export async function startReset(email: string): Promise<{ ok: true; delivered: boolean }> {
+export async function startReset(email: string): Promise<StartResetResult> {
   await connectDb();
   const u = await User.findOne({ email: email.toLowerCase().trim() }).select("_id email firstName");
   if (!u) return { ok: true, delivered: false };
@@ -32,21 +38,25 @@ export async function startReset(email: string): Promise<{ ok: true; delivered: 
     expiresAt,
   });
 
-  const link = `${env().NEXTAUTH_URL.replace(/\/$/, "")}/reset-password?token=${token}`;
-  await sendMail({
-    to: u.email,
-    subject: "Reset your Advancia Training password",
-    html: renderEmail({
-      title: "Reset your password",
-      bodyHtml: `<p>Hi ${u.firstName ?? "there"},</p>
-        <p>Click the button below to choose a new password. The link expires in 30 minutes.</p>
-        <p style="color:#666;font-size:12px">If you didn't ask for a reset, you can safely ignore this email.</p>`,
-      ctaHref: link,
-      ctaLabel: "Choose a new password",
-    }),
-    text: `Reset your Advancia Training password: ${link}`,
-  });
-  return { ok: true, delivered: true };
+  const link = `${env().NEXTAUTH_URL.replace(/\/$/, "")}/auth/reset-password?token=${token}`;
+  try {
+    const mail = await sendPasswordResetEmail({
+      to: u.email,
+      firstName: u.firstName ?? "there",
+      resetLink: link,
+    });
+    if (mail.delivered) {
+      return { ok: true, delivered: true };
+    }
+  } catch (error) {
+    console.warn("[forgot-password] reset email failed:", error);
+  }
+
+  if (env().NODE_ENV !== "production") {
+    return { ok: true, delivered: false, previewResetLink: link };
+  }
+
+  return { ok: true, delivered: false };
 }
 
 export async function finishReset(token: string, newPassword: string) {

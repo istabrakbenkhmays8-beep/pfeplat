@@ -35,6 +35,78 @@ export type CourseSeed = {
   juneSession?: { start: string; end: string };
 };
 
+/**
+ * Realistic Tunisian-market pricing per course code.
+ * Calibrated against the Advancia 2026 brochure: foundation courses sit around 350 DT/day,
+ * mid-tier pro certs around 450-500 DT/day, premium certs (PMP, ISO 27001, AZ-500) around 550-650 DT/day.
+ * coinReward scales with price so a course always returns ~12-15% of its cost back as a goodwill credit.
+ */
+type Tier = "foundation" | "standard" | "professional" | "premium" | "specialist";
+
+const TIER: Record<string, Tier> = {
+  // Premium — flagship certs you'd put on a CV
+  PMP: "premium",
+  CCNA: "premium",
+  ISO27001LI: "premium",
+  "AZ-500": "premium",
+  CSA: "premium",
+
+  // Professional — strong technical track
+  ENARSI: "professional",
+  DCCOR: "professional",
+  DCIT: "professional",
+  SSNGFW: "professional",
+  SISE: "professional",
+  DEVOPS: "professional",
+  "AZ-104": "professional",
+  "AZ-204": "professional",
+  "PL-500": "professional",
+  "DP-500": "professional",
+  "WS-011": "professional",
+  AN62G: "professional",
+
+  // Standard — common admin / specialist roles
+  NSE4: "standard",
+  SESA: "standard",
+  ATLP1: "standard",
+  "PL-300": "standard",
+  "DP-100": "standard",
+  "M-552383": "standard",
+  "EDU-330": "standard",
+  AN22G: "standard",
+
+  // Foundation — entry-level, short
+  SCRUM: "foundation",
+  ITILF: "foundation",
+  "SC-400": "foundation",
+  "TOGAF-F": "foundation",
+  "TOGAF-P": "foundation",
+};
+
+const PER_DAY_BY_TIER: Record<Tier, number> = {
+  foundation: 350,
+  standard: 450,
+  professional: 550,
+  premium: 650,
+  specialist: 500,
+};
+
+/** Round prices to nearest 50 DT for a cleaner storefront. */
+function roundTo50(n: number): number {
+  return Math.round(n / 50) * 50;
+}
+
+export function priceForCourse(code: string, durationDays: number): number {
+  const tier = TIER[code] ?? "standard";
+  return roundTo50(durationDays * PER_DAY_BY_TIER[tier]);
+}
+
+export function coinRewardForCourse(code: string, durationDays: number): number {
+  // ~13% of price returned as coins, rounded to nearest 10 for tidiness.
+  const price = priceForCourse(code, durationDays);
+  return Math.round((price * 0.13) / 10) * 10;
+}
+
 export const categories: CourseCategory[] = [
   { slug: "cisco-ccna-enterprise", name: "CCNA Enterprise", vendor: "Cisco", group: "Networking" },
   { slug: "cisco-ccnp-enterprise", name: "CCNP Enterprise", vendor: "Cisco", group: "Networking" },

@@ -26,19 +26,26 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Sea
         </p>
       </header>
 
+      {/* Order summary — one canonical place to see what you'll be charged. */}
       <div className="rounded-xl border border-border bg-card p-6">
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Course price</span>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-mono text-xs font-semibold text-muted-foreground">{preview.course.code}</p>
+            <h2 className="mt-0.5 text-base font-bold">{preview.course.title}</h2>
+          </div>
           <span className="text-2xl font-bold">{preview.course.priceTnd.toLocaleString("en-GB")} DT</span>
         </div>
-        <div className="mt-2 flex items-center justify-between text-xs">
-          <span className="text-muted-foreground">Your wallet</span>
-          <span className="font-semibold text-brand">{preview.user.walletCoins} coins</span>
-        </div>
-        <div className="mt-1 flex items-center justify-between text-xs">
-          <span className="text-muted-foreground">Reward on completion</span>
-          <span>+{preview.course.coinReward} coins</span>
-        </div>
+        <hr className="my-4 border-border" />
+        <dl className="space-y-1.5 text-sm">
+          <div className="flex items-center justify-between">
+            <dt className="text-muted-foreground">Your wallet</dt>
+            <dd className="font-semibold text-brand">{preview.user.walletCoins} coins</dd>
+          </div>
+          <div className="flex items-center justify-between">
+            <dt className="text-muted-foreground">Reward on completion</dt>
+            <dd>+{preview.course.coinReward} coins</dd>
+          </div>
+        </dl>
       </div>
 
       <CheckoutForm
@@ -47,11 +54,6 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Sea
         walletCoins={preview.user.walletCoins}
         maxCoinsUsable={preview.maxCoinsUsable}
       />
-
-      <p className="text-xs text-muted-foreground">
-        Payments run through a mock gateway in dev (`MOCK-…` reference). Real adapters (Paymee, Konnect, Flouci) plug into the same{" "}
-        <code className="rounded bg-muted px-1">PaymentService</code>.
-      </p>
 
       <p className="text-sm">
         Changed your mind?{" "}

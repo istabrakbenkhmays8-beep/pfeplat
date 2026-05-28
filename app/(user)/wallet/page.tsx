@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { CreditCard } from "lucide-react";
 import { requireRole } from "@/lib/session";
 import { listUserCoinTransactions } from "@/src/services/enrollmentService";
 import { User } from "@/src/models";
@@ -41,6 +43,13 @@ export default async function WalletPage() {
             {user?.walletCoins ?? 0}
           </p>
           <p className="mt-1 text-xs opacity-80">coins available · 1 coin = 0.10 DT off any course</p>
+          <Link
+            href="/wallet/buy"
+            className="mt-4 inline-flex h-10 items-center gap-2 rounded-md bg-white/15 px-4 text-sm font-semibold text-brand-foreground backdrop-blur transition hover:bg-white/25"
+          >
+            <CreditCard className="h-4 w-4" />
+            Buy coins with card
+          </Link>
         </div>
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
           <TunisianWallet coins={user?.walletCoins ?? 0} />

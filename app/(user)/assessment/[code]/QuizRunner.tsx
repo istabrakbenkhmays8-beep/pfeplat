@@ -103,7 +103,7 @@ export function QuizRunner({ quiz }: { quiz: Quiz }) {
             </button>
           )}
           <a
-            href={`/catalog/${encodeURIComponent(quiz.course.code)}`}
+            href={`/learn/${encodeURIComponent(quiz.course.code)}`}
             className="inline-flex h-10 items-center rounded-md border border-border bg-surface px-4 text-sm font-medium hover:bg-muted"
           >
             Back to course

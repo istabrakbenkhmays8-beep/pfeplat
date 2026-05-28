@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import Groq from "groq-sdk";
 import { Types } from "mongoose";
 import { connectDb } from "@/lib/db";
 import { env } from "@/lib/env";
@@ -6,17 +7,48 @@ import { listUserEnrollments } from "./enrollmentService";
 import { AIConversation, User } from "@/src/models";
 import type { AiScope } from "@/src/models";
 
+/** Default model when AI_MODEL isn't set — one per provider. */
+const DEFAULT_MODELS = {
+  groq: "llama-3.3-70b-versatile",
+  anthropic: "claude-3-5-haiku-20241022",
+} as const;
+
+/** True iff the user chatbot has an API key it can use. */
 export function isAiConfigured(): boolean {
-  return !!env().ANTHROPIC_API_KEY;
+  const e = env();
+  if (e.AI_API_KEY) return true;
+  // Backwards compat: legacy ANTHROPIC_API_KEY-only setups still work when
+  // AI_PROVIDER is anthropic.
+  if (e.AI_PROVIDER === "anthropic" && e.ANTHROPIC_API_KEY) return true;
+  return false;
 }
 
-let client: Anthropic | null = null;
-function getClient() {
-  if (client) return client;
-  const key = env().ANTHROPIC_API_KEY;
-  if (!key) throw new Error("ANTHROPIC_API_KEY not set");
-  client = new Anthropic({ apiKey: key });
-  return client;
+function getApiKey(): string {
+  const e = env();
+  if (e.AI_API_KEY) return e.AI_API_KEY;
+  if (e.AI_PROVIDER === "anthropic" && e.ANTHROPIC_API_KEY) return e.ANTHROPIC_API_KEY;
+  throw new Error(
+    "No AI API key configured. Set AI_API_KEY in .env (Groq: gsk_..., Anthropic: sk-ant-...).",
+  );
+}
+
+function getModel(): string {
+  const e = env();
+  return e.AI_MODEL?.trim() || DEFAULT_MODELS[e.AI_PROVIDER];
+}
+
+let groqClient: Groq | null = null;
+function getGroq(): Groq {
+  if (groqClient) return groqClient;
+  groqClient = new Groq({ apiKey: getApiKey() });
+  return groqClient;
+}
+
+let anthropicClient: Anthropic | null = null;
+function getAnthropic(): Anthropic {
+  if (anthropicClient) return anthropicClient;
+  anthropicClient = new Anthropic({ apiKey: getApiKey() });
+  return anthropicClient;
 }
 
 const SYSTEM_PROMPTS: Record<AiScope, string> = {
@@ -62,6 +94,14 @@ export async function buildUserContext(userId: string): Promise<string> {
 
 export type ChatMessage = { role: "user" | "assistant"; content: string };
 
+/** Normalized chunk yielded by streamChat — provider-agnostic. */
+export type StreamChunk = { text: string };
+
+/**
+ * Stream a chat response. Internally dispatches to Groq (OpenAI-compatible) or
+ * Anthropic based on env.AI_PROVIDER, but yields a single normalized
+ * `{ text: string }` shape so route handlers don't need to know the provider.
+ */
 export async function streamChat({
   scope,
   userId,
@@ -72,20 +112,59 @@ export async function streamChat({
   userId: string;
   history: ChatMessage[];
   conversationId?: string;
-}) {
-  const anthropic = getClient();
+}): Promise<{ stream: AsyncIterable<StreamChunk>; conversationId?: string }> {
   const system =
     SYSTEM_PROMPTS[scope] +
     (scope === "user" ? `\n\n--- LEARNER CONTEXT ---\n${await buildUserContext(userId)}` : "");
 
+  const provider = env().AI_PROVIDER;
+  const stream = provider === "groq" ? streamChatGroq({ system, history }) : streamChatAnthropic({ system, history });
+  return { stream, conversationId };
+}
+
+async function* streamChatGroq({
+  system,
+  history,
+}: {
+  system: string;
+  history: ChatMessage[];
+}): AsyncGenerator<StreamChunk> {
+  const groq = getGroq();
+  const completion = await groq.chat.completions.create({
+    model: getModel(),
+    messages: [
+      { role: "system", content: system },
+      ...history.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+    ],
+    stream: true,
+    max_tokens: 1024,
+    temperature: 0.7,
+  });
+  for await (const chunk of completion) {
+    const text = chunk.choices?.[0]?.delta?.content;
+    if (text) yield { text };
+  }
+}
+
+async function* streamChatAnthropic({
+  system,
+  history,
+}: {
+  system: string;
+  history: ChatMessage[];
+}): AsyncGenerator<StreamChunk> {
+  const anthropic = getAnthropic();
   const stream = anthropic.messages.stream({
-    model: env().ANTHROPIC_MODEL,
+    model: getModel(),
     max_tokens: 1024,
     system,
     messages: history.map((m) => ({ role: m.role, content: m.content })),
   });
-
-  return { stream, conversationId };
+  for await (const chunk of stream) {
+    if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") {
+      yield { text: chunk.delta.text };
+    }
+  }
 }
 
 export async function ensureConversation(userId: string, scope: AiScope, conversationId?: string) {

@@ -21,7 +21,7 @@ import {
   Trainer,
   User,
 } from "../src/models";
-import { categories as seedCategories, courses as seedCourses } from "../src/data/seed";
+import { categories as seedCategories, courses as seedCourses, priceForCourse, coinRewardForCourse } from "../src/data/seed";
 
 const DEFAULT_PW = "ChangeMe!2026";
 
@@ -66,8 +66,8 @@ async function main() {
       category: slugToCatId.get(c.categorySlug),
       modes: ["live_online", "on_site"],
       level: "intermediate",
-      priceTnd: c.durationDays * 600,
-      coinReward: c.durationDays * 50,
+      priceTnd: priceForCourse(c.code, c.durationDays),
+      coinReward: coinRewardForCourse(c.code, c.durationDays),
       isFeatured: featuredCodes.has(c.code),
       isPublished: true,
     })),

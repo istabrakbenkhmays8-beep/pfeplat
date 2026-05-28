@@ -150,6 +150,72 @@ export const GAMES: Game[] = [
   },
 ];
 
+// --- Third game: Cybersecurity (mapped to ISO 27001 Lead Implementer) ---
+GAMES.push({
+  code: "ISO27001LI",
+  title: "Cybersecurity drill",
+  intro:
+    "Five hands-on security scenarios you'd hit on day one as a defender. Pick the safest move, learn from the rest.",
+  challenges: [
+    {
+      prompt:
+        "A user emails saying they 'just clicked a weird link from HR' and the page asked for their password. Your first move is…",
+      options: [
+        { text: "Tell them to change their password later today", isCorrect: false },
+        { text: "Immediately revoke their session + force a password reset", isCorrect: true },
+        { text: "Ask them to forward the email so you can analyse it later", isCorrect: false },
+        { text: "Run a full anti-virus scan on their laptop", isCorrect: false },
+      ],
+      reveal:
+        "Contain first. Kill the active session and rotate the password before the attacker uses the harvested credentials. Forensics comes after containment.",
+    },
+    {
+      prompt: "Which of these passwords resists a modern offline brute-force attack the best?",
+      options: [
+        { text: "P@ssw0rd2026!", isCorrect: false },
+        { text: "correct-horse-battery-staple-tunis", isCorrect: true },
+        { text: "Advancia#1", isCorrect: false },
+        { text: "Qwerty12345$", isCorrect: false },
+      ],
+      reveal:
+        "Length beats character-class gymnastics. A long, random passphrase has way more entropy than a short 'complex' password — and it's actually memorable.",
+    },
+    {
+      prompt: "ISO/IEC 27001 calls the document that ranks information assets by risk…",
+      options: [
+        { text: "Statement of Applicability (SoA)", isCorrect: false },
+        { text: "Risk Treatment Plan", isCorrect: false },
+        { text: "Risk Assessment Report", isCorrect: true },
+        { text: "Acceptable Use Policy", isCorrect: false },
+      ],
+      reveal:
+        "The Risk Assessment Report identifies + scores risks. The Risk Treatment Plan says how you'll handle each one; the SoA lists which Annex A controls apply.",
+    },
+    {
+      prompt: "A database backup tape is shipped off-site. To stay ISO 27001 compliant you must…",
+      options: [
+        { text: "Encrypt the tape and log the chain of custody", isCorrect: true },
+        { text: "Trust the courier — they're insured", isCorrect: false },
+        { text: "Only ship inside the EU", isCorrect: false },
+        { text: "Send it via registered mail with tracking", isCorrect: false },
+      ],
+      reveal:
+        "Annex A.8.10 / A.7.10: media in transit must be protected against unauthorised access. Encryption + tracked custody is the bare minimum.",
+    },
+    {
+      prompt: "Which control category does multi-factor authentication fall under in Annex A?",
+      options: [
+        { text: "Physical controls", isCorrect: false },
+        { text: "Technological controls", isCorrect: true },
+        { text: "People controls", isCorrect: false },
+        { text: "Organisational controls", isCorrect: false },
+      ],
+      reveal:
+        "MFA is a Technological control (Annex A.8). People controls cover training/awareness; Organisational covers policies; Physical covers locks + cameras.",
+    },
+  ],
+});
+
 export function getGame(code: string): Game | undefined {
   return GAMES.find((g) => g.code.toUpperCase() === code.toUpperCase());
 }

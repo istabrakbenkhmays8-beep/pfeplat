@@ -75,6 +75,10 @@ export function UserMenu({ variant, labels = DEFAULT_LABELS }: { variant: "publi
   const roleLabel =
     user.role === "super_admin" ? "Super admin" : user.role === "admin" ? "Admin" : "Learner";
 
+  // The avatar can be a data URL (from /profile upload) or any http(s) URL.
+  // We render <img> directly for both — next/image refuses arbitrary data URLs.
+  const avatar = user.avatarUrl ?? null;
+
   return (
     <div ref={ref} className="relative">
       <button
@@ -84,9 +88,19 @@ export function UserMenu({ variant, labels = DEFAULT_LABELS }: { variant: "publi
         aria-expanded={open}
         className="inline-flex h-9 items-center gap-2 rounded-full border border-border bg-surface pe-3 ps-1 text-sm font-medium hover:bg-muted"
       >
-        <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand text-xs font-bold text-brand-foreground">
-          {initials}
-        </span>
+        {avatar ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={avatar}
+            alt=""
+            className="h-7 w-7 rounded-full object-cover"
+            referrerPolicy="no-referrer"
+          />
+        ) : (
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand text-xs font-bold text-brand-foreground">
+            {initials}
+          </span>
+        )}
         <span className="hidden sm:inline">{user.name?.split(" ")[0] || "Account"}</span>
       </button>
 
@@ -130,7 +144,7 @@ export function UserMenu({ variant, labels = DEFAULT_LABELS }: { variant: "publi
             )}
             <li>
               <Link
-                href="/dashboard"
+                href="/profile"
                 role="menuitem"
                 className="flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-muted"
               >

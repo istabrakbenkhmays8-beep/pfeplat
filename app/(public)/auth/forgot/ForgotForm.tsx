@@ -12,9 +12,12 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
+type SubmitResult = {
+  previewResetLink?: string;
+};
 
 export function ForgotForm() {
-  const [done, setDone] = useState(false);
+  const [result, setResult] = useState<SubmitResult | null>(null);
   const {
     register,
     handleSubmit,
@@ -28,17 +31,32 @@ export function ForgotForm() {
       body: JSON.stringify(data),
     });
     if (res.ok) {
-      setDone(true);
-      toast.success("Check your inbox");
+      const body = (await res.json()) as { previewResetLink?: string };
+      setResult({
+        previewResetLink: body.previewResetLink,
+      });
+      toast.success(body.previewResetLink ? "Reset link ready" : "Check your inbox");
     } else {
       toast.error("Something went wrong");
     }
   }
 
-  if (done) {
+  if (result) {
     return (
-      <div className="mt-6 rounded-md border border-success/40 bg-success/10 px-4 py-3 text-sm text-success">
-        If this email is on file, we&apos;ve sent a reset link. It expires in 30 minutes.
+      <div className="mt-6 space-y-3">
+        <div className="rounded-md border border-success/40 bg-success/10 px-4 py-3 text-sm text-success">
+          {result.previewResetLink
+            ? "Email sending is not set up on this machine yet, so your reset link is ready below."
+            : "If this email is on file, we've sent a reset link. It expires in 30 minutes."}
+        </div>
+        {result.previewResetLink ? (
+          <a
+            href={result.previewResetLink}
+            className="inline-flex h-10 w-full items-center justify-center rounded-md bg-brand text-sm font-medium text-brand-foreground hover:bg-brand-600"
+          >
+            Open reset link
+          </a>
+        ) : null}
       </div>
     );
   }

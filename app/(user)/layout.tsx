@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/session";
 const nav = [
   { href: "/dashboard", label: "Overview" },
   { href: "/my-courses", label: "My courses" },
+  { href: "/games", label: "Game challenges" },
   { href: "/wallet", label: "Coins & wallet" },
   { href: "/certificates", label: "Certificates" },
   { href: "/calendar", label: "Calendar" },

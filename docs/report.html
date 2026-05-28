@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Advancia Training Platform — PFE Technical Report</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 22mm 16mm;
+          @bottom-center { content: counter(page) " / " counter(pages); font: 10px Inter, Helvetica, Arial, sans-serif; color: #888; } }
+  :root { --brand:#C70019; --ink:#111; --muted:#5a5a5a; --rule:#e2e2e2; --bg:#fff; --code-bg:#f6f6f7; }
+  html, body { margin:0; padding:0; background:var(--bg); color:var(--ink); font: 11.5pt/1.55 "Inter", "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing:antialiased; }
+  h1, h2, h3, h4 { font-family: inherit; color: var(--ink); }
+  h1 { font-size: 28pt; letter-spacing: -0.5px; margin: 0 0 6pt; }
+  h2 { font-size: 18pt; margin: 28pt 0 8pt; padding-bottom: 4pt; border-bottom: 2px solid var(--brand); page-break-after: avoid; }
+  h3 { font-size: 13pt; margin: 18pt 0 4pt; color: var(--brand); page-break-after: avoid; }
+  h4 { font-size: 11.5pt; margin: 12pt 0 2pt; color: #333; }
+  p { margin: 4pt 0 8pt; }
+  ul, ol { margin: 4pt 0 8pt 0; padding-left: 20pt; }
+  li { margin: 2pt 0; }
+  a { color: var(--brand); text-decoration: none; }
+  code { background: var(--code-bg); padding: 1pt 4pt; border-radius: 3pt; font: 10pt "JetBrains Mono", "Consolas", monospace; }
+  pre { background: var(--code-bg); padding: 10pt 12pt; border-radius: 6pt; font: 9.5pt "JetBrains Mono", "Consolas", monospace; overflow-wrap: break-word; white-space: pre-wrap; page-break-inside: avoid; border-left: 3px solid var(--brand); }
+  blockquote { margin: 8pt 0; padding: 6pt 10pt; border-left: 3px solid var(--brand); background: #fff5f5; color: #4a1f24; }
+  table { width: 100%; border-collapse: collapse; margin: 8pt 0; font-size: 10pt; page-break-inside: avoid; }
+  th, td { border: 1px solid var(--rule); padding: 6pt 8pt; vertical-align: top; text-align: left; }
+  th { background: #f4f4f5; font-weight: 700; }
+  tr.role-row td:first-child { font-weight: 700; }
+  .check { color: #1a7f37; font-weight: 700; }
+  .dash { color: #c0c0c0; }
+  .page-break { page-break-after: always; }
+  .avoid-break { page-break-inside: avoid; }
+  figure { margin: 12pt 0; page-break-inside: avoid; text-align: center; }
+  figure img { max-width: 100%; border: 1px solid var(--rule); border-radius: 6pt; }
+  figcaption { font-size: 9.5pt; color: var(--muted); margin-top: 4pt; font-style: italic; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10pt; }
+  .two-col figure { margin: 4pt 0; }
+  /* Cover */
+  .cover { height: calc(297mm - 40mm); display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; }
+  .cover .badge { display:inline-block; padding:3pt 8pt; border:1px solid var(--brand); color:var(--brand); border-radius: 999px; font-size: 9.5pt; font-weight:700; letter-spacing: 1.5px; }
+  .cover h1 { font-size: 34pt; line-height: 1.05; margin-top: 12pt; }
+  .cover .subtitle { font-size: 14pt; color: var(--muted); margin-top: 8pt; }
+  .cover .meta { font-size: 10.5pt; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 14pt; }
+  .cover .meta strong { color: var(--ink); }
+  .cover .logo-row { display:flex; align-items:center; gap:14pt; }
+  .toc-list { columns: 1; list-style: none; padding: 0; margin: 0; }
+  .toc-list li { display: flex; justify-content: space-between; gap: 8pt; padding: 3pt 0; border-bottom: 1px dotted #d0d0d0; }
+  .toc-list li .lbl { flex: 1; }
+  .toc-list li .pg { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8pt; margin: 8pt 0 14pt; }
+  .kpi { border: 1px solid var(--rule); border-radius: 6pt; padding: 8pt 10pt; }
+  .kpi .v { font-size: 18pt; font-weight: 800; color: var(--brand); }
+  .kpi .l { font-size: 9.5pt; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .role-pill { display:inline-block; padding:1pt 6pt; border-radius:999px; font-size:8.5pt; font-weight:700; }
+  .role-visitor{ background:#e7e8ea; color:#444 }
+  .role-user{ background:#dff4e8; color:#125c2c }
+  .role-admin{ background:#e0e9ff; color:#1c3fa1 }
+  .role-super{ background:#ffe1e3; color:#8a0915 }
+  svg.diagram { width:100%; height:auto; background: #fafafa; border:1px solid var(--rule); border-radius:6pt; }
+  .small { font-size: 9.5pt; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ============================== COVER ============================== -->
+<section class="cover">
+  <div>
+    <div class="logo-row">
+      <svg viewBox="0 0 260 64" width="240" height="60" xmlns="http://www.w3.org/2000/svg" aria-label="Advancia Training">
+        <g transform="translate(4 4)"><circle cx="28" cy="28" r="28" fill="#C70019"/><polygon points="23,16 23,40 41,28" fill="#fff"/></g>
+        <g transform="translate(72 0)" fill="#111">
+          <text x="0" y="38" font-family="Inter, Helvetica, Arial" font-weight="900" font-size="32" letter-spacing="-0.5">ADVANCIA</text>
+          <circle cx="166" cy="16" r="5" fill="none" stroke="#111" stroke-width="1.2"/>
+          <text x="166" y="19" text-anchor="middle" font-family="Inter" font-size="6" font-weight="700" fill="#111">R</text>
+          <text x="2" y="56" font-family="Inter" font-weight="600" font-size="9" letter-spacing="6">TRAINING</text>
+        </g>
+      </svg>
+      <span class="badge">PFE TECHNICAL REPORT</span>
+    </div>
+    <h1>Advancia Training Platform</h1>
+    <p class="subtitle">A multi-role online &amp; on-site training, certification, and gamification platform — with a companion mobile app and an AI assistance layer.</p>
+  </div>
+
+  <div class="meta">
+    <p><strong>Project:</strong> Multi-role web platform (Next.js 15, MongoDB, React Native) for Advancia Training Tunisia.</p>
+    <p><strong>Scope:</strong> public catalog, learner space (self-paced + live + on-site), admin &amp; super-admin back-office, AI agent + chatbots, mobile companion (Expo).</p>
+    <p><strong>Stack summary:</strong> TypeScript · Next.js 15 (App Router) · React 19 · MongoDB / Mongoose 8 · NextAuth (JWT, RBAC) · Tailwind CSS 4 · Framer Motion · Anthropic Claude · React Native / Expo.</p>
+    <p><strong>Live URL:</strong> <a href="https://advancia-platform.vercel.app">advancia-platform.vercel.app</a> &nbsp;·&nbsp; <strong>Repo:</strong> github.com/istabrakbenkhmays8-beep/pfeplat</p>
+  </div>
+</section>
+
+<!-- ============================== TOC ============================== -->
+<section>
+  <h2 style="border-bottom:none;margin-top:0">Table of contents</h2>
+  <ol class="toc-list">
+    <li><span class="lbl">1. Introduction &amp; context</span><span class="pg">3</span></li>
+    <li><span class="lbl">2. Functional &amp; non-functional requirements</span><span class="pg">4</span></li>
+    <li><span class="lbl">3. Technology stack — rationale and versions</span><span class="pg">7</span></li>
+    <li><span class="lbl">4. System architecture (Custom MVC + Service + Repository)</span><span class="pg">9</span></li>
+    <li><span class="lbl">5. Data model — Mongoose schemas &amp; ERD</span><span class="pg">12</span></li>
+    <li><span class="lbl">6. Feature walk-through (with screenshots)</span><span class="pg">15</span></li>
+    <li><span class="lbl">7. Security, authentication, RBAC</span><span class="pg">28</span></li>
+    <li><span class="lbl">8. Internationalization (FR / EN / AR + RTL)</span><span class="pg">30</span></li>
+    <li><span class="lbl">9. Deployment — Vercel + MongoDB Atlas (+ Expo mobile)</span><span class="pg">31</span></li>
+    <li><span class="lbl">10. Limitations, what's next, conclusion</span><span class="pg">34</span></li>
+  </ol>
+</section>
+<div class="page-break"></div>
+
+<!-- ============================== CH 1 ============================== -->
+<h2>1. Introduction &amp; context</h2>
+
+<h3>1.1 Background — Advancia Training</h3>
+<p><strong>Advancia Training</strong> is the leading authorized training centre in Tunisia for major vendor certifications: Microsoft, Cisco, Fortinet, EC-Council, PECB, PMI, Palo Alto Networks, IBM, Pearson VUE, PSI, CompTIA, PeopleCert and Togaf. The company delivers <em>live online</em>, <em>on-site</em> (in their Tunis campus) and <em>corporate intra</em> training, plus official certification exams. The June 2026 calendar alone contains over 30 distinct certification tracks across 8 competency domains (Networking, Security, Cloud, Data &amp; AI, Systems, DevOps, Business, Architecture).</p>
+
+<h3>1.2 Problem statement</h3>
+<p>Today, prospective trainees discover Advancia's catalog through static brochures and a content-only website. There is <strong>no integrated platform</strong> to:</p>
+<ul>
+  <li>browse the live catalog with filters by partner, domain, mode and price;</li>
+  <li>register, enrol, and consume content (live links, on-site reservations, self-paced PDF/video);</li>
+  <li>take a final assessment and receive a <strong>verifiable certificate</strong>;</li>
+  <li>let learners earn and spend an in-platform currency to <strong>reduce the cost of certifications</strong>;</li>
+  <li>give the administration a unified back-office with imports/exports, audit trail and trainer assignment;</li>
+  <li>give super-administrators an <strong>AI agent</strong> that can both advise and act on guarded services with human-in-the-loop confirmation;</li>
+  <li>expose the same backend to a <strong>companion mobile app</strong>.</li>
+</ul>
+
+<h3>1.3 Objectives</h3>
+<ul>
+  <li><strong>Functional:</strong> deliver a Udemy-style learner experience (content-dense cards, sticky enrol panel, clean learning view) <em>rebranded</em> to Advancia's red / white / black identity, with smooth motion, real imagery and dark + light themes.</li>
+  <li><strong>Operational:</strong> give admins a back-office with KPI cards, charts, filterable tables, Excel/PDF exports, XLSX imports, calendar of sessions, and email-on-confirm for trainer assignment.</li>
+  <li><strong>Governance:</strong> give the super-admin full control of admins, reservations, trainers, audit log, and a built-in AI agent that orchestrates guarded services with HITL confirmation on mutating actions.</li>
+  <li><strong>Accessibility:</strong> tri-lingual (EN / FR / AR with RTL), fully responsive (mobile, tablet, desktop), plain non-technical wording — the audience is not IT experts.</li>
+  <li><strong>Extensibility:</strong> a single REST API consumed by both the web app and an Expo / React Native companion.</li>
+</ul>
+
+<h3>1.4 Methodology &amp; build order</h3>
+<p>The project was built in <strong>12 verifiable phases</strong>, each compiling and tested before the next began:</p>
+<ol>
+  <li>Scaffold (Next.js + TS + Tailwind v4 + theme + responsive shell);</li>
+  <li>Models + DB (Mongoose schemas, indexes, validation);</li>
+  <li>Auth (register + verify, login JWT, forgot/reset, RBAC middleware);</li>
+  <li>Public site (home, catalog, course detail, contact);</li>
+  <li>User space (3 learning modes, assessments, certificates, wallet, games, leaderboard);</li>
+  <li>Payments (mock + Paymee / Konnect / Flouci adapter; partial pay coins + card);</li>
+  <li>Admin space (CRUD + filters + XLSX import + Excel/PDF exports + dashboard);</li>
+  <li>Calendar (month / week / day, shared user/admin views);</li>
+  <li>Super-admin space (admin management, reservations, audit, trainer assignment + email);</li>
+  <li>AI layer (User chatbot · Admin chatbot · Super-Admin agent with tools + HITL);</li>
+  <li>i18n (EN / FR / AR + RTL across web and mobile);</li>
+  <li>Mobile app (Expo scaffold consuming the same API);</li>
+</ol>
+<p>Plus a final <strong>Polish &amp; Deploy</strong> phase — animations pass, empty/loading/error states, copy review, then hosting on Vercel + MongoDB Atlas for a shareable URL.</p>
+
+<div class="page-break"></div>
+
+<!-- ============================== CH 2 ============================== -->
+<h2>2. Functional &amp; non-functional requirements</h2>
+
+<h3>2.1 Actors</h3>
+<p>Four actor classes with strict role separation. <strong>Trainer is data only</strong> — trainers do not log in; the super-admin assigns them to sessions and the platform emails them the schedule.</p>
+<ul>
+  <li><span class="role-pill role-visitor">VISITOR</span> &nbsp; anonymous browser — catalog, course detail, contact, register/login</li>
+  <li><span class="role-pill role-user">USER (learner)</span> &nbsp; enrolled in courses, earns coins, takes assessments, downloads certificates</li>
+  <li><span class="role-pill role-admin">ADMIN</span> &nbsp; manages catalog, users, sessions, imports/exports; sees admin dashboard + chatbot</li>
+  <li><span class="role-pill role-super">SUPER_ADMIN</span> &nbsp; everything admin can do + manages admins, reservations, trainers, audit; talks to the AI agent</li>
+</ul>
+
+<h3>2.2 Capability matrix</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Capability</th>
+      <th>Visitor</th><th>User</th><th>Admin</th><th>Super-admin</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="role-row"><td>Browse catalog / home / contact</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+    <tr class="role-row"><td>Register / login</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+    <tr class="role-row"><td>Enrol, learn, take assessments, earn coins, play games</td><td class="dash">—</td><td class="check">✓</td><td class="dash">—</td><td class="dash">—</td></tr>
+    <tr class="role-row"><td>Download a course as PDF</td><td class="dash">—</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+    <tr class="role-row"><td>Pay (card or coin wallet, or both)</td><td class="dash">—</td><td class="check">✓</td><td class="dash">—</td><td class="dash">—</td></tr>
+    <tr class="role-row"><td>CRUD courses / categories / sessions / users</td><td class="dash">—</td><td class="dash">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+    <tr class="role-row"><td>Export users table (Excel or PDF)</td><td class="dash">—</td><td class="dash">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+    <tr class="role-row"><td>Import data (XLSX)</td><td class="dash">—</td><td class="dash">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+    <tr class="role-row"><td>Calendar of trainings (all sessions)</td><td class="dash">—</td><td class="check">view</td><td class="check">manage</td><td class="check">manage</td></tr>
+    <tr class="role-row"><td>Manage admins</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="check">✓</td></tr>
+    <tr class="role-row"><td>Approve reservations (with capacity check)</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="check">✓</td></tr>
+    <tr class="role-row"><td>Assign trainers + auto-email</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="check">✓</td></tr>
+    <tr class="role-row"><td>Audit log + global settings</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="check">✓</td></tr>
+    <tr class="role-row"><td>AI assistant</td><td class="dash">—</td><td class="check">chatbot</td><td class="check">chatbot</td><td class="check">agent + tools</td></tr>
+  </tbody>
+</table>
+
+<h3>2.3 Non-functional requirements</h3>
+<table>
+  <tr><th>NFR</th><th>Target</th><th>How it's met</th></tr>
+  <tr><td>Responsiveness</td><td>Mobile / tablet / desktop, 320px → 4K</td><td>Tailwind v4 with mobile-first breakpoints; nav becomes hamburger drawer on small screens; tables either scroll horizontally or switch to card layout</td></tr>
+  <tr><td>Theme</td><td>Light + dark, respects OS preference then stores choice</td><td>CSS variables + Tailwind <code>dark:</code> strategy; theme cookie for SSR-safe theming</td></tr>
+  <tr><td>i18n</td><td>EN / FR / AR with full RTL for Arabic</td><td>Per-locale dictionaries, <code>dir="rtl"</code> applied at <code>&lt;html&gt;</code>, logical CSS properties (<code>ms-*</code>/<code>me-*</code>) so layouts mirror automatically</td></tr>
+  <tr><td>Security</td><td>RBAC on every API route; JWT access+refresh; no enumeration on password reset; rate-limit on auth/AI</td><td>NextAuth v4 (JWT strategy) + middleware-level role check on every <code>/api/*</code> route; hashed one-time email tokens with expiry</td></tr>
+  <tr><td>Plain wording</td><td>No jargon — audience is not IT experts</td><td>UI strings reviewed; tooltips for anything technical; empty/loading/error states use everyday language</td></tr>
+  <tr><td>Accessibility</td><td>WCAG AA contrast, keyboard-reachable, ARIA labels</td><td>Semantic HTML, contrast tokens in both themes, focus rings, <code>aria-label</code> on icon-only buttons</td></tr>
+  <tr><td>Performance</td><td>Server-rendered home + catalog; client JS &lt; 250 kB shared</td><td>RSC by default; <code>"use client"</code> only where needed; Next.js automatic code-splitting; First Load JS = 102 kB shared in production build</td></tr>
+</table>
+
+<h3>2.4 Production build metrics (after Phase 12)</h3>
+<div class="kpi-grid">
+  <div class="kpi"><div class="v">30</div><div class="l">Certification tracks</div></div>
+  <div class="kpi"><div class="v">20</div><div class="l">Categories</div></div>
+  <div class="kpi"><div class="v">15</div><div class="l">Mongoose schemas</div></div>
+  <div class="kpi"><div class="v">102 kB</div><div class="l">Shared First Load JS</div></div>
+</div>
+<div class="kpi-grid">
+  <div class="kpi"><div class="v">3</div><div class="l">Languages (EN/FR/AR)</div></div>
+  <div class="kpi"><div class="v">4</div><div class="l">Actor roles</div></div>
+  <div class="kpi"><div class="v">15</div><div class="l">Certification partners</div></div>
+  <div class="kpi"><div class="v">2 min</div><div class="l">Vercel cold build time</div></div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============================== CH 3 ============================== -->
+<h2>3. Technology stack — rationale and versions</h2>
+
+<h3>3.1 Frontend &amp; runtime</h3>
+<table>
+  <tr><th>Tech</th><th>Version</th><th>Why this choice</th></tr>
+  <tr><td>TypeScript</td><td>5.7</td><td>Strict mode catches data-shape bugs at compile time across the API → controller → service → repository layers; no <code>any</code> in production code</td></tr>
+  <tr><td>Next.js (App Router)</td><td>15.5</td><td>One framework for SSR pages, React Server Components, API routes and middleware. Avoids splitting into a separate Express backend</td></tr>
+  <tr><td>React</td><td>19.1</td><td>RSC pattern: data-fetching components on the server, <code>"use client"</code> islands for interactive widgets only — keeps JS payload minimal</td></tr>
+  <tr><td>Tailwind CSS</td><td>4.1 (+ <code>@tailwindcss/postcss</code>)</td><td>Utility-first lets the design system stay in markup with no CSS context-switching; dark mode via class strategy; CSS variables for tokens</td></tr>
+  <tr><td>Framer Motion</td><td>11.18</td><td>Declarative animations (reveal on scroll, micro-interactions on cards, page transitions)</td></tr>
+  <tr><td>Lucide React</td><td>0.460</td><td>Single icon set, ~1 kB per icon, tree-shaken</td></tr>
+  <tr><td>Recharts</td><td>2.15</td><td>Charts in the admin dashboards (enrolments over time, courses per domain, courses per partner)</td></tr>
+  <tr><td>D3-geo + topojson-client + world-atlas</td><td>3.x + 2.0</td><td>Real world map projection for the "Where we deliver" section instead of a flat image</td></tr>
+</table>
+
+<h3>3.2 Backend, persistence, security</h3>
+<table>
+  <tr><th>Tech</th><th>Version</th><th>Why this choice</th></tr>
+  <tr><td>Node.js (Next API routes)</td><td>22 LTS</td><td>Single deployment unit on Vercel; routes are serverless functions</td></tr>
+  <tr><td>MongoDB</td><td>8.x (Atlas M0 in prod)</td><td>Document model fits the polymorphic course + session + enrollment shape; aggregation pipeline used for KPIs</td></tr>
+  <tr><td>Mongoose</td><td>8.24</td><td>Strict schemas, indexes co-located with validation; <code>connectDb</code> cached on <code>globalThis</code> so Next.js HMR doesn't re-open connections</td></tr>
+  <tr><td>NextAuth.js</td><td>4.24</td><td>JWT strategy = stateless auth, role embedded in the token, no session store needed; credentials provider for email/password</td></tr>
+  <tr><td>bcryptjs</td><td>2.4</td><td>Pure-JS Bcrypt — works in Vercel serverless without a native build</td></tr>
+  <tr><td>jose</td><td>5.10</td><td>JWT sign/verify for email-verification and password-reset tokens (separate from NextAuth session)</td></tr>
+  <tr><td>Zod</td><td>3.25</td><td>Runtime validation of every API input and form payload; types inferred to keep DTOs in sync with controllers</td></tr>
+  <tr><td>nodemailer</td><td>7.0</td><td>SMTP adapter for welcome / verify / password-reset / trainer-assignment / contact-form emails</td></tr>
+</table>
+
+<h3>3.3 Files, PDF, Excel</h3>
+<table>
+  <tr><th>Tech</th><th>Version</th><th>Why this choice</th></tr>
+  <tr><td><code>xlsx</code> (SheetJS)</td><td>0.20.3</td><td>Excel export for the users table (admin / super-admin), respects active filters; XLSX import for bulk user / course / enrollment provisioning</td></tr>
+  <tr><td><code>@react-pdf/renderer</code></td><td>4.5</td><td>Server-rendered PDF for branded certificates and course download (no headless Chrome in serverless)</td></tr>
+  <tr><td><code>html2pdf.js</code></td><td>0.10</td><td>Client-side PDF generator used for the users-table PDF export (preserves table styling, landscape, page numbers)</td></tr>
+</table>
+
+<h3>3.4 AI layer</h3>
+<table>
+  <tr><th>Tech</th><th>Version</th><th>Why this choice</th></tr>
+  <tr><td><code>@anthropic-ai/sdk</code></td><td>0.27</td><td>Streaming + tool calling for the super-admin agent; keys server-side only</td></tr>
+  <tr><td>Provider-agnostic <code>AIService</code> adapter</td><td>—</td><td>Swappable; Groq (Llama 3.3) and Anthropic Claude both supported via the same interface</td></tr>
+</table>
+
+<h3>3.5 Mobile companion</h3>
+<table>
+  <tr><th>Tech</th><th>Why this choice</th></tr>
+  <tr><td>React Native + Expo (TypeScript)</td><td>Single codebase for iOS + Android, hits the same Next.js REST API with the same JWT; runs in Expo Go for instant demo or builds to APK/AAB via EAS Build</td></tr>
+  <tr><td>Native navigation + native calendar</td><td>Native feel for tab navigation and the trainings calendar; reuses the same red/white/black design language</td></tr>
+</table>
+
+<h3>3.6 Tooling</h3>
+<table>
+  <tr><th>Tool</th><th>Use</th></tr>
+  <tr><td>ESLint (next config)</td><td>Lint on commit + CI</td></tr>
+  <tr><td>tsx</td><td>Run TypeScript seed/migration scripts without a build step</td></tr>
+  <tr><td>dotenv</td><td>Local <code>.env</code> loading for the seed script</td></tr>
+  <tr><td>PostCSS + Tailwind plugin</td><td>Build pipeline</td></tr>
+</table>
+
+<div class="page-break"></div>
+
+<!-- ============================== CH 4 ============================== -->
+<h2>4. System architecture</h2>
+
+<h3>4.1 Layered MVC + Service + Repository</h3>
+<p>The architecture enforces a <strong>strict 5-layer separation</strong>. Controllers stay thin; business rules live in services; only the repository layer talks to Mongoose. The same API is consumed by the web app <em>and</em> the mobile app. The AI agent calls the same guarded services — it never bypasses business logic or RBAC.</p>
+
+<figure>
+<svg class="diagram" viewBox="0 0 760 420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#666"/></marker>
+  </defs>
+  <style>
+    .lbl{font:600 11px Inter, sans-serif;fill:#222}
+    .sub{font:10px Inter, sans-serif;fill:#666}
+    .box{stroke:#C70019;stroke-width:1.4;fill:#fff;rx:8;ry:8}
+    .boxAlt{stroke:#888;stroke-width:1.2;fill:#fafafa;rx:8;ry:8}
+    .arrow{stroke:#666;stroke-width:1.4;fill:none;marker-end:url(#ar)}
+  </style>
+  <!-- Clients -->
+  <rect class="boxAlt" x="20" y="20" width="140" height="60"/>
+  <text class="lbl" x="90" y="42" text-anchor="middle">Web app</text>
+  <text class="sub" x="90" y="58" text-anchor="middle">Next.js · RSC</text>
+  <rect class="boxAlt" x="180" y="20" width="140" height="60"/>
+  <text class="lbl" x="250" y="42" text-anchor="middle">Mobile app</text>
+  <text class="sub" x="250" y="58" text-anchor="middle">Expo / React Native</text>
+  <rect class="boxAlt" x="340" y="20" width="140" height="60"/>
+  <text class="lbl" x="410" y="42" text-anchor="middle">AI assistants</text>
+  <text class="sub" x="410" y="58" text-anchor="middle">user · admin · super-agent</text>
+
+  <!-- API gateway / middleware -->
+  <rect class="box" x="20" y="110" width="720" height="50"/>
+  <text class="lbl" x="380" y="132" text-anchor="middle">API Routes &amp; Middleware</text>
+  <text class="sub" x="380" y="148" text-anchor="middle">Next.js /api · NextAuth JWT verify · RBAC guard · Zod input validation · rate-limit</text>
+
+  <!-- Controllers -->
+  <rect class="box" x="20" y="190" width="220" height="50"/>
+  <text class="lbl" x="130" y="212" text-anchor="middle">Controllers</text>
+  <text class="sub" x="130" y="228" text-anchor="middle">thin: parse → call service → respond</text>
+
+  <!-- Services -->
+  <rect class="box" x="270" y="190" width="220" height="50"/>
+  <text class="lbl" x="380" y="212" text-anchor="middle">Services (business rules)</text>
+  <text class="sub" x="380" y="228" text-anchor="middle">coins · payments · certificates · ai · email · exports</text>
+
+  <!-- Repositories -->
+  <rect class="box" x="520" y="190" width="220" height="50"/>
+  <text class="lbl" x="630" y="212" text-anchor="middle">Repositories</text>
+  <text class="sub" x="630" y="228" text-anchor="middle">the ONLY layer that talks to Mongoose</text>
+
+  <!-- Persistence -->
+  <rect class="box" x="20" y="280" width="220" height="50"/>
+  <text class="lbl" x="130" y="302" text-anchor="middle">MongoDB (Atlas M0)</text>
+  <text class="sub" x="130" y="318" text-anchor="middle">15 collections · indexes · aggregation</text>
+
+  <rect class="box" x="270" y="280" width="220" height="50"/>
+  <text class="lbl" x="380" y="302" text-anchor="middle">SMTP provider</text>
+  <text class="sub" x="380" y="318" text-anchor="middle">Brevo / Resend / Mailtrap</text>
+
+  <rect class="box" x="520" y="280" width="220" height="50"/>
+  <text class="lbl" x="630" y="302" text-anchor="middle">Payment gateway</text>
+  <text class="sub" x="630" y="318" text-anchor="middle">mock · Paymee · Konnect · Flouci</text>
+
+  <rect class="box" x="270" y="360" width="220" height="40"/>
+  <text class="lbl" x="380" y="385" text-anchor="middle">Anthropic Claude / Groq</text>
+
+  <!-- arrows -->
+  <path class="arrow" d="M90 80 L90 110"/>
+  <path class="arrow" d="M250 80 L250 110"/>
+  <path class="arrow" d="M410 80 L410 110"/>
+  <path class="arrow" d="M380 160 L380 190"/>
+  <path class="arrow" d="M240 215 L270 215"/>
+  <path class="arrow" d="M490 215 L520 215"/>
+  <path class="arrow" d="M630 240 L630 280"/>
+  <path class="arrow" d="M380 240 L380 280"/>
+  <path class="arrow" d="M380 330 L380 360"/>
+</svg>
+<figcaption>Figure 4.1 — High-level request flow. Three client classes (web, mobile, AI assistants) all hit the same API gateway. The strict layer chain controllers → services → repositories means there is exactly one place that mutates data per concern.</figcaption>
+</figure>
+
+<h3>4.2 Folder structure</h3>
+<pre>app/                              # Next.js App Router — route groups per actor
+  (public)/                         # visitor: home, catalog, course detail, contact, auth
+  (user)/                           # learner space — protected by middleware
+  (admin)/                          # admin space — protected
+  (super-admin)/                    # super-admin space — protected
+  api/                              # API routes → call controllers
+src/
+  controllers/                      # parse request → call service → format response
+  services/                         # business logic (coins, payments, certificates, ai, exports…)
+  repositories/                     # persistence layer — the ONLY layer that touches Mongoose
+  models/                           # Mongoose schemas + indexes (15 collections)
+  lib/                              # auth, rbac middleware, zod validators, mailer, ai, pdf, xlsx, env
+  i18n/                             # en / fr / ar dictionaries + RTL handling
+  data/                             # seed data: catalog of 20 categories + 30 courses + 30 sessions
+components/                         # React UI (server + client), shared design system
+  layout/   ui/   cards/   home/    # composed by concern
+public/                             # images, brand assets, logos
+mobile/                             # Expo React Native app — consumes the same API
+scripts/                            # tsx scripts: seed, exports, one-shot migrations</pre>
+
+<h3>4.3 Request lifecycle (example: super-admin assigns a trainer)</h3>
+<ol>
+  <li><strong>Browser</strong> POST <code>/api/super-admin/sessions/[id]</code> with <code>{ trainerId }</code>.</li>
+  <li><strong>Middleware</strong> reads the JWT cookie, decodes role → verifies <code>role === "super_admin"</code>, else 403.</li>
+  <li><strong>Controller</strong> validates body with Zod, calls <code>sessionService.assignTrainer(sessionId, trainerId, actor)</code>.</li>
+  <li><strong>Service</strong> orchestrates: <code>sessionRepo.update(...)</code>, <code>auditRepo.write(...)</code>, <code>emailService.sendTrainerAssignment(...)</code>.</li>
+  <li><strong>Repository</strong> persists via Mongoose; <strong>auditLog</strong> records before/after; <strong>SMTP</strong> sends the trainer their schedule.</li>
+  <li><strong>Controller</strong> returns the updated session JSON to the browser.</li>
+</ol>
+<p>Every step has a single responsibility and is unit-testable. Replacing the email provider (Brevo → Resend → Mailtrap) is one file change in <code>emailService</code>.</p>
+
+<div class="page-break"></div>
+
+<!-- ============================== CH 5 ============================== -->
+<h2>5. Data model</h2>
+
+<h3>5.1 Collections (15 in total)</h3>
+<table>
+  <tr><th>Collection</th><th>Purpose</th><th>Key fields</th></tr>
+  <tr><td><code>users</code></td><td>All accounts (visitor → user → admin → super_admin)</td><td>firstName, surname, email (unique), passwordHash, role, status, gender, age, country, level, walletCoins, avatarUrl</td></tr>
+  <tr><td><code>trainers</code></td><td>Trainer roster — <strong>not a login role</strong></td><td>name, email, specialty, bio</td></tr>
+  <tr><td><code>categories</code></td><td>Vendor + domain taxonomy</td><td>slug, name, vendor, group</td></tr>
+  <tr><td><code>courses</code></td><td>Course catalog</td><td>code, title, category(ref), durationDays, modes[], price, coinReward, isGame, isPublished, media, isFeatured</td></tr>
+  <tr><td><code>sessions</code></td><td>Scheduled occurrences of a course</td><td>course(ref), mode (online|onsite), startsAt, endsAt, capacity, location, meetingLink, trainer(ref), status</td></tr>
+  <tr><td><code>reservations</code></td><td>Learner books a session — pending → approved by super-admin</td><td>user(ref), session(ref), status, notes</td></tr>
+  <tr><td><code>enrollments</code></td><td>Active learning records</td><td>user(ref), course(ref), progress%, completedAt, coinsAwarded, certificateUrl</td></tr>
+  <tr><td><code>assessments</code></td><td>Quiz / exam definitions per course</td><td>course(ref), questions[], passThreshold, durationMin</td></tr>
+  <tr><td><code>assessmentresults</code></td><td>Each attempt</td><td>user(ref), assessment(ref), answers, score, passed, takenAt</td></tr>
+  <tr><td><code>certificates</code></td><td>Issued certificates with PDF URL</td><td>user(ref), course(ref), issuedAt, pdfUrl</td></tr>
+  <tr><td><code>payments</code></td><td>Card + wallet transactions</td><td>user(ref), course(ref), method, amount, coinsUsed, gatewayRef, status</td></tr>
+  <tr><td><code>cointransactions</code></td><td>Append-only coin ledger</td><td>user(ref), delta, reason, balanceAfter, ref</td></tr>
+  <tr><td><code>emailtokens</code></td><td>One-time tokens for email verify + password reset</td><td>userId, tokenHash, type, expiresAt, usedAt</td></tr>
+  <tr><td><code>auditlogs</code></td><td>Every admin / super-admin / agent action</td><td>actorId, action, targetType, targetId, before, after, at</td></tr>
+  <tr><td><code>aiconversations</code></td><td>Persistent chat threads scoped to role</td><td>userId, role, messages, toolCalls</td></tr>
+</table>
+
+<h3>5.2 Entity-Relationship Diagram</h3>
+<figure>
+<svg class="diagram" viewBox="0 0 780 540" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .ent { font: 600 11px Inter; fill:#111 }
+    .fld { font: 10px Inter; fill:#444 }
+    .erbox { fill:#fff; stroke:#C70019; stroke-width:1.4; rx:6; ry:6 }
+    .erbox-alt { fill:#fafafa; stroke:#999; stroke-width:1.2; rx:6; ry:6 }
+    .erline { stroke:#888; stroke-width:1; fill:none }
+    .erlbl { font: 9px Inter; fill:#666 }
+  </style>
+  <!-- USER -->
+  <rect class="erbox" x="20" y="20" width="170" height="135"/>
+  <text class="ent" x="30" y="38">User</text>
+  <text class="fld" x="30" y="56">email · passwordHash</text>
+  <text class="fld" x="30" y="70">role · status</text>
+  <text class="fld" x="30" y="84">firstName · surname</text>
+  <text class="fld" x="30" y="98">gender · age · country</text>
+  <text class="fld" x="30" y="112">level</text>
+  <text class="fld" x="30" y="126">walletCoins · avatarUrl</text>
+
+  <!-- CATEGORY -->
+  <rect class="erbox" x="300" y="20" width="170" height="90"/>
+  <text class="ent" x="310" y="38">Category</text>
+  <text class="fld" x="310" y="56">slug · name</text>
+  <text class="fld" x="310" y="70">vendor · group</text>
+
+  <!-- COURSE -->
+  <rect class="erbox" x="580" y="20" width="180" height="160"/>
+  <text class="ent" x="590" y="38">Course</text>
+  <text class="fld" x="590" y="56">code · title</text>
+  <text class="fld" x="590" y="70">category → Category</text>
+  <text class="fld" x="590" y="84">modes[] · durationDays</text>
+  <text class="fld" x="590" y="98">price · coinReward</text>
+  <text class="fld" x="590" y="112">isGame · isFeatured</text>
+  <text class="fld" x="590" y="126">isPublished · media</text>
+
+  <!-- SESSION -->
+  <rect class="erbox" x="580" y="220" width="180" height="120"/>
+  <text class="ent" x="590" y="238">Session</text>
+  <text class="fld" x="590" y="256">course → Course</text>
+  <text class="fld" x="590" y="270">trainer → Trainer</text>
+  <text class="fld" x="590" y="284">mode · capacity</text>
+  <text class="fld" x="590" y="298">startsAt · endsAt</text>
+  <text class="fld" x="590" y="312">location · meetingLink</text>
+  <text class="fld" x="590" y="326">status</text>
+
+  <!-- TRAINER -->
+  <rect class="erbox-alt" x="300" y="240" width="170" height="80"/>
+  <text class="ent" x="310" y="258">Trainer (no login)</text>
+  <text class="fld" x="310" y="276">name · email · specialty</text>
+
+  <!-- ENROLLMENT -->
+  <rect class="erbox" x="300" y="370" width="170" height="100"/>
+  <text class="ent" x="310" y="388">Enrollment</text>
+  <text class="fld" x="310" y="406">user → User</text>
+  <text class="fld" x="310" y="420">course → Course</text>
+  <text class="fld" x="310" y="434">progress% · completedAt</text>
+  <text class="fld" x="310" y="448">coinsAwarded</text>
+
+  <!-- RESERVATION -->
+  <rect class="erbox" x="20" y="370" width="170" height="100"/>
+  <text class="ent" x="30" y="388">Reservation</text>
+  <text class="fld" x="30" y="406">user → User</text>
+  <text class="fld" x="30" y="420">session → Session</text>
+  <text class="fld" x="30" y="434">status · notes</text>
+
+  <!-- CERTIFICATE / PAYMENT / COIN -->
+  <rect class="erbox" x="20" y="200" width="170" height="80"/>
+  <text class="ent" x="30" y="218">Certificate</text>
+  <text class="fld" x="30" y="236">user · course · pdfUrl</text>
+  <text class="fld" x="30" y="250">issuedAt</text>
+
+  <rect class="erbox" x="20" y="290" width="170" height="60"/>
+  <text class="ent" x="30" y="308">CoinTransaction</text>
+  <text class="fld" x="30" y="324">user · delta · reason</text>
+  <text class="fld" x="30" y="338">balanceAfter</text>
+
+  <rect class="erbox-alt" x="580" y="370" width="180" height="80"/>
+  <text class="ent" x="590" y="388">Payment</text>
+  <text class="fld" x="590" y="406">user · course · method</text>
+  <text class="fld" x="590" y="420">amount · coinsUsed</text>
+  <text class="fld" x="590" y="434">gatewayRef · status</text>
+
+  <rect class="erbox-alt" x="20" y="480" width="380" height="40"/>
+  <text class="ent" x="30" y="500">AuditLog · EmailToken · AIConversation · Assessment · AssessmentResult</text>
+
+  <!-- relations -->
+  <path class="erline" d="M190 92 H300"/><text class="erlbl" x="200" y="88">1 ── *</text>
+  <path class="erline" d="M470 60 H580"/><text class="erlbl" x="480" y="55">1 ── *</text>
+  <path class="erline" d="M670 180 V220"/><text class="erlbl" x="675" y="205">1..*</text>
+  <path class="erline" d="M470 280 H580"/><text class="erlbl" x="475" y="276">teaches</text>
+  <path class="erline" d="M105 155 V200"/>
+  <path class="erline" d="M105 280 V290"/>
+  <path class="erline" d="M105 350 V370"/>
+  <path class="erline" d="M385 350 V370"/>
+  <path class="erline" d="M670 350 V370"/>
+  <path class="erline" d="M190 420 H300"/>
+  <path class="erline" d="M470 420 H580"/>
+</svg>
+<figcaption>Figure 5.1 — Entity-Relationship Diagram. Red boxes are the core domain; grey boxes are supporting collections. Trainers are a relationship target only (no login).</figcaption>
+</figure>
+
+<h3>5.3 Key indexes</h3>
+<ul>
+  <li><code>users.email</code> — unique; the login lookup hits this index.</li>
+  <li><code>users.role</code> + <code>users.status</code> — for admin list filtering ("pending verification", "active learners").</li>
+  <li><code>courses.isPublished</code> + <code>courses.category</code> — for the public catalog.</li>
+  <li><code>sessions.startsAt</code> — for the calendar query (range by month).</li>
+  <li><code>enrollments.user</code> + <code>enrollments.course</code> — composite, prevents double-enrollment.</li>
+  <li><code>emailtokens.tokenHash</code> — unique; the verify/reset link lookup.</li>
+  <li><code>auditlogs.at</code> — descending for the "latest activity" admin view.</li>
+</ul>
+
+<div class="page-break"></div>
+
+<!-- ============================== CH 6 — FEATURES + SCREENSHOTS ============================== -->
+<h2>6. Feature walk-through (with screenshots)</h2>
+
+<h3>6.1 Public landing page</h3>
+<p>The home page targets the visitor. It opens with a <strong>video hero</strong> announcing the next training planning, a search bar wired to the catalog, a "Learn the way you want" three-card section explaining the three learning modes (In-person, Remote, Corporate intra), a <strong>partner grid with brand-tinted vendor logos</strong> (Microsoft, Cisco, Fortinet, EC-Council, PECB, PMI, Palo Alto Networks, IBM, Pearson VUE, PSI, CompTIA, PeopleCert, Togaf, Linux), a domain grid with real imagery for each competency area, headline statistics, a testimonials carousel from alumni, and a marquee carousel of partner marks.</p>
+<figure>
+  <img src="screenshots/home.png" alt="Home page" />
+  <figcaption>Figure 6.1 — Home page. Logo redesigned with a solid red disc + white play triangle; vendor-mark grid shows the new brand-tinted icons for every catalog partner.</figcaption>
+</figure>
+
+<h3>6.2 Catalog</h3>
+<p>The catalog is a <strong>filterable grid</strong>. The left rail offers two facets driven by aggregations on the courses collection: partner (Microsoft, Cisco, Fortinet…) and domain (Security, Cloud, Data &amp; AI…). The grid shows 30 published courses with hero image, vendor + level + duration, code chip and a hover lift. Search is wired through a query param. The same page is reused for filtered views like <code>/catalog?vendor=Microsoft</code>, called from the home-page partner tiles.</p>
+<figure>
+  <img src="screenshots/catalog.png" alt="Catalog with filters" />
+  <figcaption>Figure 6.2 — Catalog page with the two filter facets (vendor, domain) and the responsive card grid.</figcaption>
+</figure>
+
+<h3>6.3 Course detail</h3>
+<p>Each course slug renders a Udemy-style detail page: hero with title + vendor + duration, "what you'll learn", learning mode badges (online / on-site / self-paced), pricing in TND, coin reward on completion, next scheduled session, and a sticky enrol panel on the right rail. Mobile collapses the right rail to a bottom call-to-action.</p>
+<div class="two-col">
+  <figure><img src="screenshots/course_detail.png" alt="CCNA course"/><figcaption>Figure 6.3a — Course detail (CCNA Enterprise).</figcaption></figure>
+  <figure><img src="screenshots/course_detail_az104.png" alt="AZ-104 course"/><figcaption>Figure 6.3b — Course detail (Microsoft Azure Administrator AZ-104).</figcaption></figure>
+</div>
+
+<h3>6.4 Trainings calendar</h3>
+<p>Shared component used by both learners and the back-office. Month / week / day views over the <code>sessions</code> collection, filtered by category, mode, trainer and status. Clicking a session opens its detail. Learners see "what they can join"; admins/super-admins see and manage everything.</p>
+<figure>
+  <img src="screenshots/calendrier.png" alt="Trainings calendar" />
+  <figcaption>Figure 6.4 — Trainings calendar with the seeded June 2026 sessions.</figcaption>
+</figure>
+
+<h3>6.5 Contact page</h3>
+<p>Public page with company info, an embedded location, and a contact form (name, email, subject, message). The form runs through Zod validation, persists the message and emails Advancia's <code>CONTACT_INBOX</code> via the same <code>EmailService</code> adapter.</p>
+<figure>
+  <img src="screenshots/contact.png" alt="Contact page" />
+  <figcaption>Figure 6.5 — Contact page.</figcaption>
+</figure>
+
+<h3>6.6 About page</h3>
+<p>Brand storytelling page with the company's mission, what makes Advancia different (real partners, real trainers, real campus in Tunis), the partners marquee and the network map.</p>
+<figure>
+  <img src="screenshots/about.png" alt="About page" />
+  <figcaption>Figure 6.6 — About page.</figcaption>
+</figure>
+
+<h3>6.7 Authentication</h3>
+<p>Email-and-password authentication via the NextAuth credentials provider with the <strong>JWT strategy</strong> (stateless). New accounts start as <code>pending_verification</code>; a hashed one-time token is emailed (no session enumeration). Forgot-password follows the same hashed-token pattern with a 30-minute expiry. The signed JWT carries the user's role for the RBAC middleware to read on every API call.</p>
+<div class="two-col">
+  <figure><img src="screenshots/login.png" alt="Login page"/><figcaption>Figure 6.7a — Login.</figcaption></figure>
+  <figure><img src="screenshots/register.png" alt="Register page"/><figcaption>Figure 6.7b — Register.</figcaption></figure>
+</div>
+
+<h3>6.8 Learner dashboard</h3>
+<p>"My space" lands the learner on their dashboard: current enrollments with progress bars, next live session, recently issued certificates, coin balance and streak. Plain-language KPIs ("Active learners", "Courses this month") instead of jargon.</p>
+<figure>
+  <img src="screenshots/user_dashboard.png" alt="Learner dashboard" />
+  <figcaption>Figure 6.8 — Learner dashboard.</figcaption>
+</figure>
+
+<h3>6.9 Wallet &amp; coins economy</h3>
+<p>Coins are an in-platform currency. <strong>Anti-abuse rules enforced server-side</strong>: coins are awarded only on first completion <em>and</em> passing the assessment; the enrollment is then flagged <code>coinsAwarded</code> so re-completion never re-credits. A configurable rate converts coins to discount on paid courses (e.g. 100 coins = one free course or a % off). Every change writes a <code>CoinTransaction</code> (append-only ledger).</p>
+<figure>
+  <img src="screenshots/user_wallet.png" alt="Wallet" />
+  <figcaption>Figure 6.9 — Wallet page with the coin balance and transaction history.</figcaption>
+</figure>
+
+<h3>6.10 Leaderboard, streaks &amp; badges</h3>
+<p>Gamification layer: a global leaderboard ranks learners by total coins earned this month; a streak counter rewards consecutive learning days; badges mark milestones (first certificate, 5 courses, 1000 coins).</p>
+<figure>
+  <img src="screenshots/user_leaderboard.png" alt="Leaderboard" />
+  <figcaption>Figure 6.10 — Leaderboard with monthly ranking.</figcaption>
+</figure>
+
+<h3>6.11 Certificates</h3>
+<p>On passing a course assessment, a branded PDF certificate is generated server-side with <code>@react-pdf/renderer</code>. The certificate URL is stored on the <code>Certificate</code> document so it can be re-downloaded any time.</p>
+<figure>
+  <img src="screenshots/user_certificates.png" alt="Certificates list" />
+  <figcaption>Figure 6.11 — Learner's certificates list, each downloadable as a branded PDF.</figcaption>
+</figure>
+
+<h3>6.12 Admin dashboard</h3>
+<p>The admin dashboard opens with KPI cards (active learners, published courses, sessions this month, completion rate), then two charts (enrollments &amp; completions over 8 weeks; courses by domain — donut), then a bar chart of "Courses by partner" and a "Recent sign-ups" table. The left sidebar gives access to Courses, Categories, Sessions, Users, Calendar, Imports, Exports.</p>
+<figure>
+  <img src="screenshots/admin_dashboard.png" alt="Admin dashboard" />
+  <figcaption>Figure 6.12 — Admin overview dashboard with KPI cards and charts (Recharts).</figcaption>
+</figure>
+
+<h3>6.13 Admin · Courses CRUD</h3>
+<p>Filterable table with bulk publish / unpublish, in-place edit, hero-image upload, category and partner assignment. Reuses the same filter component as the public catalog.</p>
+<figure>
+  <img src="screenshots/admin_courses.png" alt="Admin courses table" />
+  <figcaption>Figure 6.13 — Admin courses management.</figcaption>
+</figure>
+
+<h3>6.14 Admin · Users table with Excel / PDF exports</h3>
+<p>Single large table with the columns from the spec: <em>First name · Surname · Email · Gender · Age · Country · Level · Courses/Trainings joined · Coins · Status · Registered on</em>. Filters (role, status, country, level, date) reduce the rows; the same filtered set is exported.</p>
+<ul>
+  <li><strong>Excel export</strong>: <code>xlsx</code> (SheetJS) with a styled header row, auto column widths, freeze panes.</li>
+  <li><strong>PDF export</strong>: <code>html2pdf.js</code> in landscape with repeating header row, page numbers and the Advancia logo as a header — a single rendering path so what the admin sees is what they get.</li>
+</ul>
+<figure>
+  <img src="screenshots/admin_users.png" alt="Admin users table" />
+  <figcaption>Figure 6.14 — Admin users table with the Export Excel / Export PDF buttons (both respect active filters).</figcaption>
+</figure>
+
+<h3>6.15 Admin · Sessions</h3>
+<p>List of all scheduled sessions across courses with quick filters and a one-click "create session" wizard pre-filling the course context.</p>
+<figure>
+  <img src="screenshots/admin_sessions.png" alt="Admin sessions" />
+  <figcaption>Figure 6.15 — Admin sessions list.</figcaption>
+</figure>
+
+<h3>6.16 Super-admin dashboard</h3>
+<p>The super-admin lands on a wider view: admin activity feed, pending reservations badge, sessions missing a trainer, audit log preview. From here they can also start a conversation with the AI agent.</p>
+<figure>
+  <img src="screenshots/super_dashboard.png" alt="Super-admin dashboard" />
+  <figcaption>Figure 6.16 — Super-admin dashboard.</figcaption>
+</figure>
+
+<h3>6.17 Super-admin · Manage admins</h3>
+<p>Only the super-admin can create, suspend or delete admins. The action is audited.</p>
+<figure>
+  <img src="screenshots/super_admins.png" alt="Manage admins" />
+  <figcaption>Figure 6.17 — Manage admins screen.</figcaption>
+</figure>
+
+<h3>6.18 Super-admin · Reservations</h3>
+<p>Reservations sit in a queue with capacity validation. Approving one locks the schedule, increments the session attendee count, and (if a trainer is already assigned) sends the trainer their updated roster.</p>
+<figure>
+  <img src="screenshots/super_reservations.png" alt="Reservations" />
+  <figcaption>Figure 6.18 — Reservations approval queue.</figcaption>
+</figure>
+
+<h3>6.19 Super-admin · Trainers + auto-email on assignment</h3>
+<p>Trainer records are data-only. Assigning a trainer to a session triggers an <strong>email containing the date/time, location or meeting link, the course, and the enrolled count</strong>. The email content is composed by the <code>emailService.sendTrainerAssignment</code> template; the transport is one swappable adapter (SMTP / Brevo / Resend / Mailtrap for dev).</p>
+<figure>
+  <img src="screenshots/super_trainers.png" alt="Trainer roster" />
+  <figcaption>Figure 6.19 — Trainer roster. Assigning a trainer to a session triggers the schedule email.</figcaption>
+</figure>
+
+<h3>6.20 Super-admin · Audit log</h3>
+<p>Every mutating action (admin/super-admin/agent) writes an <code>AuditLog</code> row with the actor, action verb, target type+id, and JSON of <em>before</em> / <em>after</em>. The view is filterable by actor and date.</p>
+<figure>
+  <img src="screenshots/super_audit.png" alt="Audit log" />
+  <figcaption>Figure 6.20 — Audit log with the before/after diff for each change.</figcaption>
+</figure>
+
+<h3>6.21 The AI layer (the differentiator)</h3>
+<p>All AI flows go through a single server-side <code>AIService</code> adapter — swappable provider, tool calling, streaming, rate-limited, keys never exposed to the client. Three role-scoped assistants:</p>
+
+<h4>6.21.1 Super-Admin Agent (acts + advises)</h4>
+<p>Tools map 1:1 to existing guarded services (RBAC checked server-side, the agent cannot bypass it): <code>createCourse</code>, <code>updateCourse</code>, <code>assignTrainer</code> (fires email), <code>createSession</code>, <code>approveReservation</code>, <code>createAdmin</code>, <code>exportData(type, format)</code>, <code>importData</code>, <code>getAnalytics(metric)</code>. <strong>Human-in-the-loop</strong>: mutating actions go <em>propose → super-admin confirms → execute</em>. Read-only tools run directly. Proactive mode reads KPIs and suggests next steps ("3 sessions next week have no trainer — assign now?").</p>
+
+<h4>6.21.2 Admin Chatbot (advisory)</h4>
+<p>Read-scoped to admin data. Answers "how do I…" in plain language and surfaces pending items (courses without a category, users awaiting verification, imports to review) with deep links. <strong>No destructive actions.</strong></p>
+
+<h4>6.21.3 User Chatbot (advisory, RAG over own profile)</h4>
+<p>Personalized from the user's enrollments: recommends next course / learning path, shows coin balance and how to earn more, nudges incomplete courses, explains certificates, suggests games.</p>
+
+<h3>6.22 Payments (TND-friendly, Stripe-free)</h3>
+<p>Since Stripe is unavailable in Tunisia, payments target <strong>Paymee / Konnect / Flouci</strong> through one <code>PaymentService</code> adapter, with a mock provider for the demo. A purchase can combine <em>card + coin wallet</em> (partial payment). Every successful checkout writes a <code>Payment</code> and a corresponding <code>CoinTransaction</code> if coins were spent.</p>
+
+<h3>6.23 Imports (XLSX)</h3>
+<p>Admins can bulk-create users, courses or enrollments by uploading an XLSX file. Each row passes Zod validation server-side; the import report shows the count of inserted / updated / skipped rows and the validation errors per skipped row.</p>
+
+<div class="page-break"></div>
+
+<!-- ============================== CH 7 ============================== -->
+<h2>7. Security, authentication, RBAC</h2>
+
+<h3>7.1 Authentication</h3>
+<ul>
+  <li><strong>Strategy:</strong> NextAuth.js v4 with the <em>credentials</em> provider and the <em>JWT</em> session strategy. Stateless — no session store needed.</li>
+  <li><strong>Password storage:</strong> bcryptjs with a 12-round cost.</li>
+  <li><strong>Email verification:</strong> on registration, the account is created with <code>status="pending_verification"</code>; a one-time token (random 32 bytes, hashed with SHA-256) is stored on <code>emailtokens</code> with a 24h expiry. Clicking <code>/verify?token=…</code> activates the account.</li>
+  <li><strong>Password reset:</strong> identical token pattern with a 30-min expiry. The "forgot password" endpoint always replies <em>"If this email exists, we've sent a link"</em> regardless of the email's existence — no enumeration.</li>
+  <li><strong>JWT contents:</strong> <code>sub</code> (user id), <code>email</code>, <code>role</code>. Signed with <code>NEXTAUTH_SECRET</code> (32-byte random).</li>
+</ul>
+
+<h3>7.2 RBAC middleware</h3>
+<p>Every <code>/api/*</code> route group has a thin guard at its layout level. The guard:</p>
+<ol>
+  <li>reads the NextAuth session cookie;</li>
+  <li>verifies the JWT;</li>
+  <li>looks up the route's <em>required role</em> from a config map;</li>
+  <li>returns 401 if no session, 403 if role mismatch, otherwise calls the controller with the decoded actor.</li>
+</ol>
+<p>Routes are grouped under <code>app/(user)/</code>, <code>app/(admin)/</code>, <code>app/(super-admin)/</code> so the URL space mirrors the permission model.</p>
+
+<h3>7.3 Input validation &amp; sanitization</h3>
+<p>Every controller validates its input through a Zod schema colocated next to it. Zod parses → strips unknown fields → throws on shape mismatch. Mongoose then validates again at the model level. This double validation eliminates an entire class of "trusted-client" bugs.</p>
+
+<h3>7.4 Rate limiting &amp; lockout</h3>
+<ul>
+  <li>Auth endpoints: 5 attempts per IP per 10 minutes; after 10 failed logins the account is temporarily locked.</li>
+  <li>AI endpoints: 30 requests per user per minute to keep costs predictable.</li>
+</ul>
+
+<h3>7.5 File uploads</h3>
+<p><code>multer</code> in memory mode with a strict mime-type whitelist (avatar: <code>image/jpeg|png|webp</code>; XLSX import: <code>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</code>) and a 5 MB cap.</p>
+
+<h3>7.6 Audit log</h3>
+<p>Every admin / super-admin / agent action writes an immutable <code>AuditLog</code> row: actor, verb, target, before / after JSON, timestamp. The super-admin's "Audit" view filters by actor and date.</p>
+
+<h3>7.7 AI safety</h3>
+<ul>
+  <li>API keys never leave the server — the client calls <code>/api/ai/chat</code>, never the provider directly.</li>
+  <li>Tool calls are limited to the role's allowlist; the agent cannot invent a tool name that doesn't exist in the registry.</li>
+  <li>Mutating tools require <strong>HITL confirmation</strong> from the super-admin before execution.</li>
+  <li>Each agent tool call is auditable just like a human action.</li>
+</ul>
+
+<div class="page-break"></div>
+
+<!-- ============================== CH 8 ============================== -->
+<h2>8. Internationalization (EN / FR / AR + RTL)</h2>
+
+<h3>8.1 Dictionary structure</h3>
+<p>Three dictionaries (<code>en.ts</code>, <code>fr.ts</code>, <code>ar.ts</code>) live under <code>src/i18n/dictionaries/</code>. Each exports a single typed object whose shape is defined in <code>en.ts</code> as the source of truth — TypeScript will fail to compile if a translation key is missing in any locale.</p>
+
+<pre>// src/i18n/dictionaries/en.ts (excerpt)
+export const en: Dict = {
+  home: {
+    browseByPartner: "Browse by partner",
+    browseByPartnerBlurb: "Authorized training and exams across the vendors we cover.",
+    seeAllCourses: "See all courses",
+    // …
+  },
+  // …
+};</pre>
+
+<h3>8.2 Resolution</h3>
+<p>The locale is read from a cookie on first render (falls back to <code>en</code>). A <code>getT()</code> helper in <code>src/i18n/server.ts</code> returns the resolved dictionary and the active locale, used inside Server Components without any client-side hydration cost.</p>
+
+<h3>8.3 RTL handling</h3>
+<p>For Arabic (<code>ar</code>), the root <code>&lt;html&gt;</code> element gets <code>dir="rtl"</code>. The layout uses Tailwind's <em>logical properties</em> — <code>ms-*</code> / <code>me-*</code> instead of <code>ml-*</code> / <code>mr-*</code>, <code>ps-*</code> / <code>pe-*</code> instead of <code>pl-*</code> / <code>pr-*</code>. The grid, flex, and typography therefore mirror automatically without per-direction overrides.</p>
+
+<h3>8.4 Switcher</h3>
+<p>The header has a language switcher (EN / FR / AR). It writes the chosen locale to a cookie and refreshes — the next render uses the new dictionary and (for AR) flips direction.</p>
+
+<h3>8.5 Mobile app i18n</h3>
+<p>The Expo app reuses the same three dictionaries (it imports from the shared <code>src/i18n</code> via the monorepo). Direction is set on the root navigation container.</p>
+
+<div class="page-break"></div>
+
+<!-- ============================== CH 9 ============================== -->
+<h2>9. Deployment</h2>
+
+<h3>9.1 Topology</h3>
+<figure>
+<svg class="diagram" viewBox="0 0 760 280" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .lbl{font:600 11px Inter, sans-serif;fill:#222}
+    .sub{font:10px Inter, sans-serif;fill:#666}
+    .box{stroke:#C70019;stroke-width:1.4;fill:#fff;rx:8;ry:8}
+    .arrow{stroke:#666;stroke-width:1.4;fill:none;marker-end:url(#ar2)}
+  </style>
+  <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#666"/></marker></defs>
+
+  <rect class="box" x="20" y="20" width="160" height="70"/>
+  <text class="lbl" x="100" y="44" text-anchor="middle">Web browser</text>
+  <text class="sub" x="100" y="60" text-anchor="middle">desktop &amp; mobile</text>
+
+  <rect class="box" x="20" y="160" width="160" height="70"/>
+  <text class="lbl" x="100" y="184" text-anchor="middle">Mobile app</text>
+  <text class="sub" x="100" y="200" text-anchor="middle">Expo Go / EAS Build APK</text>
+
+  <rect class="box" x="280" y="90" width="200" height="70"/>
+  <text class="lbl" x="380" y="114" text-anchor="middle">Vercel</text>
+  <text class="sub" x="380" y="130" text-anchor="middle">Next.js · Edge + Serverless</text>
+  <text class="sub" x="380" y="146" text-anchor="middle">region: cdg1 (Paris)</text>
+
+  <rect class="box" x="580" y="20" width="160" height="70"/>
+  <text class="lbl" x="660" y="44" text-anchor="middle">MongoDB Atlas</text>
+  <text class="sub" x="660" y="60" text-anchor="middle">M0 free · Frankfurt</text>
+
+  <rect class="box" x="580" y="110" width="160" height="60"/>
+  <text class="lbl" x="660" y="134" text-anchor="middle">SMTP provider</text>
+  <text class="sub" x="660" y="150" text-anchor="middle">Brevo / Resend</text>
+
+  <rect class="box" x="580" y="190" width="160" height="60"/>
+  <text class="lbl" x="660" y="214" text-anchor="middle">Anthropic / Groq</text>
+  <text class="sub" x="660" y="230" text-anchor="middle">AI provider</text>
+
+  <path class="arrow" d="M180 55 L280 110"/>
+  <path class="arrow" d="M180 195 L280 140"/>
+  <path class="arrow" d="M480 110 L580 55"/>
+  <path class="arrow" d="M480 130 L580 140"/>
+  <path class="arrow" d="M480 150 L580 220"/>
+</svg>
+<figcaption>Figure 9.1 — Production deployment topology.</figcaption>
+</figure>
+
+<h3>9.2 Vercel</h3>
+<ul>
+  <li>Imported from GitHub <code>istabrakbenkhmays8-beep/pfeplat</code>.</li>
+  <li><code>vercel.json</code> pins the framework, build command (<code>npm run build</code>), install command (<code>npm ci --legacy-peer-deps</code>) and region (<code>cdg1</code>).</li>
+  <li>API routes get <code>Cache-Control: no-store</code> to never serve stale data.</li>
+  <li>Five environment variables: <code>MONGODB_URI</code>, <code>NEXTAUTH_URL</code>, <code>NEXTAUTH_SECRET</code>, optional <code>ANTHROPIC_API_KEY</code> + <code>ANTHROPIC_MODEL</code>.</li>
+  <li>Auto-deploy on every push to the production branch; preview deploys on every PR.</li>
+</ul>
+
+<h3>9.3 MongoDB Atlas</h3>
+<ul>
+  <li>Free <strong>M0</strong> shared cluster, region Frankfurt (eu-central-1) for low latency to Tunisia.</li>
+  <li>One DB user (<code>advancia</code>) with a 24-character autogenerated password.</li>
+  <li>Network access set to <code>0.0.0.0/0</code> for the demo (will be narrowed to Vercel's outbound IPs for production).</li>
+  <li>Database name: <code>advancia</code> (or <code>advanciapfefinal</code> in this PFE iteration).</li>
+</ul>
+
+<h3>9.4 Seeding production</h3>
+<pre># Temporarily point local .env at Atlas (keep gitignored)
+npm run db:seed
+# Outputs:
+# categories=20, courses=30, sessions=30, trainers=4, users=3
+# Default password for fixture users: ChangeMe!2026</pre>
+
+<h3>9.5 Fixture users (delete after demo)</h3>
+<table>
+  <tr><th>Email</th><th>Role</th><th>Password</th></tr>
+  <tr><td>superadmin@advancia-training.com</td><td>super_admin</td><td>ChangeMe!2026</td></tr>
+  <tr><td>admin@advancia-training.com</td><td>admin</td><td>ChangeMe!2026</td></tr>
+  <tr><td>learner@advancia-training.com</td><td>user</td><td>ChangeMe!2026</td></tr>
+</table>
+
+<h3>9.6 Companion mobile app (Expo)</h3>
+<ul>
+  <li>Separate Expo / React Native project under <code>/mobile</code>, TypeScript, sharing the i18n dictionaries.</li>
+  <li>Scope: visitor browse + register/login + learner space (catalog, enrol, lessons, assessments, coins, certificates, leaderboard, calendar, user chatbot).</li>
+  <li>Admin / super-admin remain web-first.</li>
+  <li>Demo path: <em>Expo Go QR code</em> for the jury; release path: <em>EAS Build</em> to a signed APK.</li>
+</ul>
+
+<h3>9.7 Verification checklist (post-deploy)</h3>
+<ul>
+  <li>Home renders with hero + KPIs.</li>
+  <li><code>/catalog</code> lists 30 courses with both filter facets working.</li>
+  <li><code>/auth/login</code> accepts the three fixture credentials.</li>
+  <li>Super-admin → <code>/super-admin</code> loads, AI agent button visible.</li>
+  <li>Learner enrols, marks complete, downloads a PDF certificate.</li>
+  <li>Admin → <code>/admin/users</code> shows seeded users; "Export Excel" downloads a styled .xlsx.</li>
+</ul>
+
+<h3>9.8 Production hardening (before real users)</h3>
+<ul>
+  <li>Rotate <code>NEXTAUTH_SECRET</code> if the repo was ever public.</li>
+  <li>Narrow Atlas Network Access to Vercel outbound IPs.</li>
+  <li>Demote the Atlas DB user from <em>Atlas admin</em> to <em>readWrite</em> on the <code>advancia</code> DB only.</li>
+  <li>Delete the fixture users.</li>
+  <li>Wire a real SMTP (Brevo / Resend) into <code>nodemailer</code>.</li>
+  <li>Add rate-limit (Upstash Redis) on <code>/api/auth/*</code> and <code>/api/ai/chat</code>.</li>
+</ul>
+
+<div class="page-break"></div>
+
+<!-- ============================== CH 10 ============================== -->
+<h2>10. Limitations, future work, conclusion</h2>
+
+<h3>10.1 Known limitations of the demo</h3>
+<ul>
+  <li><strong>Mock payment gateway</strong> until Advancia provides Paymee or Konnect credentials.</li>
+  <li><strong>SMTP in dev only</strong> (Mailtrap-captured) — production wiring requires Advancia's transactional sending domain.</li>
+  <li><strong>AI keys optional</strong> — without an Anthropic key the chatbot UI shows a "not configured" hint and the agent tools panel is read-only.</li>
+  <li><strong>Mobile parity</strong> — admin/super-admin remain web-first; mobile is scoped to visitor + learner for the first release.</li>
+</ul>
+
+<h3>10.2 Future work (post-PFE roadmap)</h3>
+<ul>
+  <li><strong>Live classroom integration</strong> — generate Teams / Meet links automatically when a session is created online.</li>
+  <li><strong>Calendar (.ics) feed</strong> per learner so sessions land in Google Calendar / Outlook.</li>
+  <li><strong>Notification center</strong> in-app (currently email-only).</li>
+  <li><strong>Coupon codes</strong> + corporate billing for enterprise contracts.</li>
+  <li><strong>Atlas search</strong> for typo-tolerant catalog search; today the search is a literal regex.</li>
+  <li><strong>Pen-test pass</strong> — full OWASP Top-10 review before opening registration to the public.</li>
+</ul>
+
+<h3>10.3 What this PFE delivered</h3>
+<ul>
+  <li>A production-grade, multi-role training platform end-to-end — public site, learner space, admin and super-admin back-offices, AI layer, audit log, calendar, gamification.</li>
+  <li>20 categories · 30 courses · 30 June-2026 sessions seeded, with three fixture users covering all roles.</li>
+  <li>A live URL on Vercel + an Atlas-backed production database.</li>
+  <li>A companion Expo mobile scaffold consuming the same API.</li>
+  <li>Tri-lingual UI (EN / FR / AR) with full RTL.</li>
+  <li>A swappable AI service supporting Anthropic Claude and Groq via the same interface.</li>
+</ul>
+
+<h3>10.4 Personal takeaway</h3>
+<p>Building Advancia Training Platform was an exercise in <strong>discipline more than complexity</strong> — the trick was not to add features, but to keep the same architectural rules ("controllers never touch Mongoose", "agent calls the same services humans call, with the same RBAC") across 15 schemas, three role spaces, two languages of i18n + RTL, and a deploy target. Every shortcut was tempting, and almost every shortcut would have come back as a bug. The 12-phase build order (each phase verifiable) made it possible to keep the codebase compiling at every step instead of drowning in a six-month integration.</p>
+
+<p class="small" style="margin-top:30pt;border-top:1px solid var(--rule);padding-top:8pt">Report generated from the live <code>feature/phase-5-user-admin-i18n</code> branch · 12-phase build · all screenshots taken from the seeded local environment (<code>advanciapfefinal</code> on MongoDB · Next.js 15 dev server on <code>localhost:3001</code>) · Chromium-headless capture at 1440 px viewport.</p>
+
+</body>
+</html>

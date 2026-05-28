@@ -3,6 +3,33 @@ import { env } from "@/lib/env";
 
 let cachedTransport: nodemailer.Transporter | null = null;
 
+export type SendMailInput = {
+  to: string;
+  subject: string;
+  html: string;
+  text?: string;
+};
+
+export type SendMailResult = {
+  ok: true;
+  delivered: boolean;
+  reason: "sent" | "missing_config" | "transport_error";
+};
+
+function extractEmailAddress(value: string | undefined): string | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  const match = trimmed.match(/<([^>]+)>/);
+  const candidate = (match?.[1] ?? trimmed).trim();
+  return candidate.includes("@") ? candidate : null;
+}
+
+function buildSmtpFromAddress(): string | null {
+  const smtpUser = env().SMTP_USER?.trim();
+  if (!smtpUser || !smtpUser.includes("@")) return null;
+  return `Advancia Training <${smtpUser}>`;
+}
+
 function getTransport(): nodemailer.Transporter | null {
   if (cachedTransport) return cachedTransport;
   const e = env();
@@ -18,35 +45,58 @@ function getTransport(): nodemailer.Transporter | null {
   return cachedTransport;
 }
 
-export type SendMailInput = {
-  to: string;
-  subject: string;
-  html: string;
-  text?: string;
-};
-
 /**
- * Send mail. In dev, when SMTP env vars are missing, logs to the console and
- * returns ok=true so the rest of the app behaves normally.
+ * Send mail. When SMTP is missing, we log the message locally instead of pretending
+ * it reached a real inbox. If the configured sender address is rejected by the
+ * provider, retry once with the authenticated SMTP user as the sender.
  */
-export async function sendMail(input: SendMailInput): Promise<{ ok: true; delivered: boolean }> {
+export async function sendMail(input: SendMailInput): Promise<SendMailResult> {
   const t = getTransport();
   if (!t) {
-    // Dev fallback — print to server logs so the developer can see the link.
-    console.info("[email] (no SMTP configured — would have sent):");
+    console.info("[email] (no SMTP configured - would have sent):");
     console.info(`  to:      ${input.to}`);
     console.info(`  subject: ${input.subject}`);
     console.info(`  body:    ${input.text ?? input.html.replace(/<[^>]+>/g, "").slice(0, 400)}`);
-    return { ok: true, delivered: false };
+    return { ok: true, delivered: false, reason: "missing_config" };
   }
-  await t.sendMail({
-    from: env().MAIL_FROM,
-    to: input.to,
-    subject: input.subject,
-    html: input.html,
-    text: input.text,
-  });
-  return { ok: true, delivered: true };
+
+  const primaryFrom = env().MAIL_FROM;
+  const primaryFromEmail = extractEmailAddress(primaryFrom);
+  const smtpFrom = buildSmtpFromAddress();
+  const smtpFromEmail = extractEmailAddress(smtpFrom ?? undefined);
+
+  try {
+    await t.sendMail({
+      from: primaryFrom,
+      to: input.to,
+      subject: input.subject,
+      html: input.html,
+      text: input.text,
+    });
+    return { ok: true, delivered: true, reason: "sent" };
+  } catch (error) {
+    const canRetryWithSmtpSender = smtpFrom && smtpFromEmail && primaryFromEmail && smtpFromEmail !== primaryFromEmail;
+    if (!canRetryWithSmtpSender) {
+      console.warn("[email] send failed:", error);
+      return { ok: true, delivered: false, reason: "transport_error" };
+    }
+
+    try {
+      console.warn("[email] send failed with MAIL_FROM, retrying with SMTP_USER sender:", error);
+      await t.sendMail({
+        from: smtpFrom,
+        replyTo: primaryFrom,
+        to: input.to,
+        subject: input.subject,
+        html: input.html,
+        text: input.text,
+      });
+      return { ok: true, delivered: true, reason: "sent" };
+    } catch (retryError) {
+      console.warn("[email] retry with SMTP_USER sender also failed:", retryError);
+      return { ok: true, delivered: false, reason: "transport_error" };
+    }
+  }
 }
 
 /** A minimal branded email shell. */
@@ -69,7 +119,7 @@ export function renderEmail(opts: { title: string; bodyHtml: string; ctaHref?: s
           ${cta ? `<div style="margin-top:24px">${cta}</div>` : ""}
         </td></tr>
         <tr><td style="padding:20px 28px;background:#f4f4f5;color:#666;font-size:12px">
-          Sent by Advancia Training — Tunis · Casablanca · Aix-en-Provence · Abidjan
+          Sent by Advancia Training - Tunis | Casablanca | Aix-en-Provence | Abidjan
         </td></tr>
       </table>
     </td></tr>

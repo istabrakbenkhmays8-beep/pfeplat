@@ -331,3 +331,16 @@ export function toolsForAnthropic() {
     input_schema: t.input_schema,
   }));
 }
+
+/** What we send to Groq (OpenAI-compatible) in the `tools` field. Same JSON Schema,
+ *  but wrapped in OpenAI's `{type: "function", function: {...}}` envelope. */
+export function toolsForGroq() {
+  return AGENT_TOOLS.map((t) => ({
+    type: "function" as const,
+    function: {
+      name: t.name,
+      description: t.description,
+      parameters: t.input_schema,
+    },
+  }));
+}

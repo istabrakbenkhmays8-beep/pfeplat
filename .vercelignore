@@ -1,6 +1,8 @@
 # Don't deploy the mobile app or local-only artifacts to Vercel.
+# Leading slash anchors at the repo root so `public/reference/` (the PDF
+# the calendar page links to) is NOT excluded.
 mobile/
-reference/
+/reference/
 _brand-source/
 .smoke.pid
 .pr-body.md

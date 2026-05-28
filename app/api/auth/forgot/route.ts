@@ -17,6 +17,9 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return Response.json({ ok: true });
   }
-  await startReset(parsed.data.email);
-  return Response.json({ ok: true });
+  const result = await startReset(parsed.data.email);
+  return Response.json({
+    ok: true,
+    previewResetLink: result.previewResetLink,
+  });
 }

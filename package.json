@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "db:seed": "tsx scripts/seed.ts"
+    "db:seed": "tsx scripts/seed.ts",
+    "db:reprice": "tsx scripts/reprice.ts",
+    "gen:diagrams": "tsx scripts/generate-diagrams.tsx",
+    "gen:prompt": "tsx scripts/generate-prompt-pdf.tsx"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.3",
@@ -21,6 +24,7 @@
     "d3-geo": "^3.1.1",
     "date-fns": "^4.3.0",
     "framer-motion": "^11.18.2",
+    "groq-sdk": "^0.9.1",
     "html2pdf.js": "^0.10.3",
     "jose": "^5.10.0",
     "lucide-react": "^0.460.0",

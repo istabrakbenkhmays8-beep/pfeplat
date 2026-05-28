@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Flame } from "lucide-react";
+import { Flame, Gamepad2, Sparkles } from "lucide-react";
 import { Types } from "mongoose";
 import { getSession } from "@/lib/session";
 import { connectDb } from "@/lib/db";
@@ -23,7 +23,6 @@ export default async function UserDashboardPage() {
   const userDoc = await User.findById(uid);
   if (!userDoc) return null;
 
-  // Re-evaluate badges on each dashboard load (cheap, idempotent).
   await awardBadgesIfDue(userDoc);
   await userDoc.save();
 
@@ -45,7 +44,7 @@ export default async function UserDashboardPage() {
         {(userDoc.currentStreak ?? 0) > 0 && (
           <div className="inline-flex items-center gap-2 rounded-full border border-orange-300 bg-orange-50 px-3 py-1.5 text-sm font-semibold text-orange-900 dark:border-orange-500/40 dark:bg-orange-500/10 dark:text-orange-200">
             <Flame className="h-4 w-4" />
-            {userDoc.currentStreak}-day streak · longest {userDoc.longestStreak ?? userDoc.currentStreak}
+            {userDoc.currentStreak}-day streak - longest {userDoc.longestStreak ?? userDoc.currentStreak}
           </div>
         )}
       </header>
@@ -66,6 +65,31 @@ export default async function UserDashboardPage() {
           </Link>
         ))}
       </div>
+
+      <section className="overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-brand/10 via-card to-card p-6">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand text-brand-foreground">
+            <Gamepad2 className="h-6 w-6" />
+          </div>
+          <div className="flex-1">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand">
+              <Sparkles className="h-3 w-3" />
+              Earn coins
+            </div>
+            <h2 className="mt-1 text-lg font-bold">Play a quick hero run</h2>
+            <p className="text-sm text-muted-foreground">
+              Three short runner games. Jump over problems, pause anytime, and enjoy a quick break between lessons.
+            </p>
+          </div>
+          <Link
+            href="/games"
+            className="inline-flex h-10 items-center gap-2 rounded-md bg-brand px-4 text-sm font-semibold text-brand-foreground hover:bg-brand-600"
+          >
+            Open games
+            <span aria-hidden>-&gt;</span>
+          </Link>
+        </div>
+      </section>
 
       {(userDoc.badges ?? []).length > 0 && (
         <section>
@@ -111,7 +135,7 @@ export default async function UserDashboardPage() {
             {recent.map((r) => (
               <Link
                 key={r.enrollmentId}
-                href={`/catalog/${encodeURIComponent(r.course.code)}`}
+                href={`/learn/${encodeURIComponent(r.course.code)}`}
                 className="rounded-xl border border-border bg-card p-4 transition hover:border-brand/50 hover:shadow-sm"
               >
                 <p className="font-mono text-xs text-muted-foreground">{r.course.code}</p>

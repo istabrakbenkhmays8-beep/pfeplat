@@ -7,6 +7,7 @@ import {
   User,
 } from "@/src/models";
 import { enroll } from "./enrollmentService";
+import { sendPaymentReceiptEmail } from "./emailTemplates";
 
 /** Coins → TND discount ratio. 100 coins == 10 TND off. Fully server-side. */
 const COIN_VALUE_TND = 0.1;
@@ -74,16 +75,20 @@ export async function checkout(opts: {
 
   // 2) Mock-provider payment: always succeeds. Real adapters (Paymee/Konnect/Flouci) plug in here.
   const userOid = new Types.ObjectId(opts.userId);
+  const providerRef = `MOCK-${Date.now()}-${Math.floor(Math.random() * 9000 + 1000)}`;
+  const method: "card" | "wallet" | "card_plus_wallet" =
+    totals.coinsUsed > 0 ? (totals.tndDue > 0 ? "card_plus_wallet" : "wallet") : "card";
+  const paidAt = new Date();
   const payment = await Payment.create({
     user: userOid,
     enrollment: new Types.ObjectId(enrollResult.enrollmentId),
     provider: "mock",
-    providerRef: `MOCK-${Date.now()}-${Math.floor(Math.random() * 9000 + 1000)}`,
-    method: totals.coinsUsed > 0 ? (totals.tndDue > 0 ? "card_plus_wallet" : "wallet") : "card",
+    providerRef,
+    method,
     amountTnd: totals.tndDue,
     coinsUsed: totals.coinsUsed,
     status: "succeeded",
-    paidAt: new Date(),
+    paidAt,
   });
 
   // 3) Debit coins if any were used.
@@ -102,6 +107,33 @@ export async function checkout(opts: {
       });
     }
   }
+
+  // 4) Payment confirmation email — fire-and-forget so SMTP issues never roll back the purchase.
+  //    We re-read user + course inline so the receipt has display fields without an extra service hop.
+  (async () => {
+    try {
+      const [u, c] = await Promise.all([
+        User.findById(userOid).select("email firstName").lean<{ email: string; firstName: string } | null>(),
+        Course.findOne({ code: opts.courseCode.toUpperCase() })
+          .select("title code")
+          .lean<{ title: string; code: string } | null>(),
+      ]);
+      if (!u || !c) return;
+      await sendPaymentReceiptEmail({
+        to: u.email,
+        firstName: u.firstName,
+        courseTitle: c.title,
+        courseCode: c.code,
+        method,
+        amountTnd: totals.tndDue,
+        coinsUsed: totals.coinsUsed,
+        providerRef,
+        paidAt,
+      });
+    } catch (err) {
+      console.warn("[checkout] receipt email failed:", err);
+    }
+  })();
 
   return {
     ok: true,

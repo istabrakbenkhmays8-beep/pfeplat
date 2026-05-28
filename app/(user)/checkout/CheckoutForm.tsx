@@ -16,13 +16,14 @@ export function CheckoutForm({
   courseCode,
   priceTnd,
   walletCoins,
-  maxCoinsUsable,
+  maxCoinsUsable: _maxCoinsUsable,
 }: {
   courseCode: string;
   priceTnd: number;
   walletCoins: number;
-  /** Max coins the server will accept (≤ wallet AND ≤ price). For "pay with coins only" we need
-   *  enough to cover the full price; otherwise that option is disabled. */
+  /** Max coins the server will accept (≤ wallet AND ≤ price). Kept for API
+   *  compatibility with /api/checkout/preview; currently we recompute it
+   *  locally from priceTnd, but we may switch to the server value. */
   maxCoinsUsable: number;
 }) {
   const router = useRouter();

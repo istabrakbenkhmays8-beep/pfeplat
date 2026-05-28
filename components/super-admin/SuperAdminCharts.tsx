@@ -23,7 +23,6 @@ type RevenuePoint = { week: string; revenueTnd: number };
 type CoinFlowPoint = { week: string; earned: number; spent: number };
 
 const BRAND = "#E30613";
-const BRAND_DARK = "#8A040C";
 const BRAND_LIGHT = "#F49AA0";
 const ACCENT = "#0E7C66";
 const GOLD = "#C08A1A";
