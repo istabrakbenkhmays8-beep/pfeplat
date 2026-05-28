@@ -103,7 +103,14 @@ export function SearchBar({
   }
 
   return (
-    <div ref={wrapRef} className={cn("relative w-full", className)}>
+    <div
+      ref={wrapRef}
+      role="combobox"
+      aria-haspopup="listbox"
+      aria-expanded={open}
+      aria-controls="search-suggestions"
+      className={cn("relative w-full", className)}
+    >
       <form
         onSubmit={submit}
         role="search"
@@ -123,8 +130,6 @@ export function SearchBar({
           autoFocus={autoFocus}
           autoComplete="off"
           aria-autocomplete="list"
-          aria-expanded={open}
-          aria-controls="search-suggestions"
           className={cn(
             "w-full rounded-full border border-border bg-surface ps-10 pe-24 outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20",
             heights[size],

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { getT } from "@/src/i18n/server";
 
@@ -58,6 +59,7 @@ export async function VideoHero() {
         </div>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          {/* PDF download stays as a plain <a> with target=_blank — it's a static asset, not a Next page. */}
           <a
             href="/reference/planning-formation-juin-2026.pdf"
             target="_blank"
@@ -71,12 +73,12 @@ export async function VideoHero() {
             </svg>
             {t.home.downloadPlanning}
           </a>
-          <a
+          <Link
             href="/catalog"
             className="inline-flex h-12 items-center justify-center rounded-md border border-white/40 bg-white/10 px-6 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20"
           >
             {t.home.browseCourses}
-          </a>
+          </Link>
         </div>
       </div>
     </section>
