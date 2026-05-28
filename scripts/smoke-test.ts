@@ -6,6 +6,7 @@
  * Usage:  npx tsx scripts/smoke-test.ts [base-url]
  *         (defaults to http://localhost:3005)
  */
+export {}; // mark as ES module so its top-level names don't collide with sibling scripts
 const BASE = process.argv[2] ?? "http://localhost:3005";
 
 type Probe = {

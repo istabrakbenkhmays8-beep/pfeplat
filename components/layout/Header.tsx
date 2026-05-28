@@ -6,7 +6,9 @@ import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { MobileNavToggle } from "./MobileNavToggle";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { UserMenu } from "./UserMenu";
+import { NotificationBell } from "./NotificationBell";
 import { Logo } from "@/components/ui/Logo";
+import { getSession } from "@/lib/session";
 import { getT } from "@/src/i18n/server";
 
 type Nav = { href: string; label: string };
@@ -18,9 +20,9 @@ export async function Header({
   variant?: "public" | "app";
   nav?: Nav[];
 }) {
-  const c = await cookies();
+  const [c, { t }, session] = await Promise.all([cookies(), getT(), getSession()]);
   const locale = c.get("locale")?.value ?? "en";
-  const { t } = await getT();
+  const signedIn = !!session?.user;
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-surface/85 backdrop-blur supports-[backdrop-filter]:bg-surface/70">
@@ -54,6 +56,7 @@ export async function Header({
           <div className={variant === "public" ? "flex items-center gap-2" : "ms-auto flex items-center gap-2"}>
             <LanguageSwitcher current={locale} />
             <ThemeToggle />
+            {signedIn && <NotificationBell />}
             <UserMenu
               variant={variant}
               labels={{

@@ -8,7 +8,8 @@ export const runtime = "nodejs";
 type RouteParams = Promise<{ id: string }>;
 
 export async function PATCH(req: Request, { params }: { params: RouteParams }) {
-  await requireRole("super_admin");
+  // Both admin + super_admin can manage trainers (rank-based check).
+  await requireRole("admin");
   const { id } = await params;
   if (!Types.ObjectId.isValid(id)) return Response.json({ error: "InvalidId" }, { status: 400 });
 

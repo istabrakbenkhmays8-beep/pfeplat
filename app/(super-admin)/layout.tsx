@@ -7,6 +7,7 @@ const nav = [
   { href: "/super-admin/sessions", label: "Sessions" },
   { href: "/super-admin/reservations", label: "Reservations" },
   { href: "/super-admin/trainers", label: "Trainers" },
+  { href: "/super-admin/admins", label: "Admins" },
   { href: "/super-admin/audit", label: "Audit log" },
 ];
 

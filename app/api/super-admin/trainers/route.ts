@@ -5,7 +5,9 @@ import { createTrainer } from "@/src/services/trainerService";
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
-  await requireRole("super_admin");
+  // Both admin + super_admin can manage trainers — requireRole("admin") accepts
+  // anyone with rank >= admin (i.e. admin and super_admin).
+  await requireRole("admin");
   let body: unknown;
   try {
     body = await req.json();

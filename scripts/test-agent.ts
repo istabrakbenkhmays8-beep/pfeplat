@@ -7,6 +7,7 @@
  * Run:  npx tsx scripts/test-agent.ts
  *       npx tsx scripts/test-agent.ts "What needs my attention right now?"
  */
+export {}; // mark as ES module so its top-level names don't collide with sibling scripts
 const BASE = "http://localhost:3000";
 const CREDENTIALS = { email: "superadmin@advancia-training.com", password: "ChangeMe!2026" };
 const QUESTION = process.argv[2] ?? "What needs my attention right now? Use your tools to check.";
