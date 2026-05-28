@@ -3,21 +3,22 @@ import { Container } from "@/components/layout/Container";
 import { VendorBadge } from "@/components/ui/VendorBadge";
 import { getUpcomingSessionsGroupedByWeek } from "@/src/repositories/courseRepo";
 import { sessionRange } from "@/lib/dates";
+import { getT } from "@/src/i18n/server";
 import type { Vendor } from "@/src/data/seed";
 
 export const metadata = { title: "Training calendar" };
 export const dynamic = "force-dynamic";
 
 export default async function CalendrierPage() {
-  const weeks = await getUpcomingSessionsGroupedByWeek();
+  const [{ t }, weeks] = await Promise.all([getT(), getUpcomingSessionsGroupedByWeek()]);
   const total = weeks.reduce((acc, [, items]) => acc + items.length, 0);
 
   return (
     <Container size="wide" className="py-10">
       <header className="max-w-3xl">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Training calendar</h1>
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{t.calendarPage.title}</h1>
         <p className="mt-2 text-muted-foreground">
-          {total} sessions scheduled for June 2026 across all our domains. Click any course to see details and reserve a seat.
+          {total}. {t.calendarPage.subtitle}
         </p>
         <a
           href="/reference/planning-formation-juin-2026.pdf"
@@ -30,7 +31,7 @@ export default async function CalendrierPage() {
             <polyline points="7 10 12 15 17 10" />
             <line x1="12" y1="15" x2="12" y2="3" />
           </svg>
-          Download the full June 2026 planning (PDF)
+          {t.calendarPage.downloadFullPlanning}
         </a>
       </header>
 

@@ -9,6 +9,7 @@ import { LearningFormats } from "@/components/home/LearningFormats";
 import { NetworkMap } from "@/components/home/NetworkMap";
 import { PartnersCarousel } from "@/components/home/PartnersCarousel";
 import { ZelligeDivider } from "@/components/ui/ZelligeDivider";
+import { Reveal } from "@/components/ui/Reveal";
 import {
   countByGroup,
   countByVendor,
@@ -61,13 +62,15 @@ export default async function HomePage() {
       {/* LES CHIFFRES */}
       <section className="border-b border-border">
         <Container size="wide" className="py-14">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.home.byTheNumbers}</h2>
-          <p className="mt-2 text-muted-foreground">{t.home.byTheNumbersBlurb}</p>
+          <Reveal>
+            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.home.byTheNumbers}</h2>
+            <p className="mt-2 text-muted-foreground">{t.home.byTheNumbersBlurb}</p>
+          </Reveal>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <KpiCard value={`${stats.yearsOfExperience}+`} label={t.home.yearsExpertise} hint={t.home.yearsExpertiseHint} />
-            <KpiCard value={`${stats.courses}+`} label={t.home.coursesAvailable} hint={t.home.coursesAvailableHint} />
-            <KpiCard value={`${stats.vendors}`} label={t.home.authorizedPartners} hint={t.home.authorizedPartnersHint} />
-            <KpiCard value={`${stats.domains}`} label={t.home.competencyDomains} hint={t.home.competencyDomainsHint} />
+            <Reveal delay={0.05}><KpiCard value={`${stats.yearsOfExperience}+`} label={t.home.yearsExpertise} hint={t.home.yearsExpertiseHint} /></Reveal>
+            <Reveal delay={0.15}><KpiCard value={`${stats.courses}+`} label={t.home.coursesAvailable} hint={t.home.coursesAvailableHint} /></Reveal>
+            <Reveal delay={0.25}><KpiCard value={`${stats.vendors}`} label={t.home.authorizedPartners} hint={t.home.authorizedPartnersHint} /></Reveal>
+            <Reveal delay={0.35}><KpiCard value={`${stats.domains}`} label={t.home.competencyDomains} hint={t.home.competencyDomainsHint} /></Reveal>
           </div>
         </Container>
       </section>
@@ -78,15 +81,17 @@ export default async function HomePage() {
       {/* BROWSE BY VENDOR */}
       <section className="border-b border-border">
         <Container size="wide" className="py-16">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.home.browseByPartner}</h2>
-              <p className="mt-2 text-muted-foreground">{t.home.browseByPartnerBlurb}</p>
+          <Reveal>
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.home.browseByPartner}</h2>
+                <p className="mt-2 text-muted-foreground">{t.home.browseByPartnerBlurb}</p>
+              </div>
+              <Link href="/catalog" className="text-sm font-medium text-brand hover:underline">
+                {t.home.seeAllCourses}
+              </Link>
             </div>
-            <Link href="/catalog" className="text-sm font-medium text-brand hover:underline">
-              {t.home.seeAllCourses}
-            </Link>
-          </div>
+          </Reveal>
           <div className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {vendors.map((v) => (
               <Link
@@ -108,12 +113,14 @@ export default async function HomePage() {
       {/* BROWSE BY DOMAIN */}
       <section className="border-b border-border bg-muted/30">
         <Container size="wide" className="py-16">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.home.browseByDomain}</h2>
-              <p className="mt-2 text-muted-foreground">{t.home.browseByDomainBlurb}</p>
+          <Reveal>
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.home.browseByDomain}</h2>
+                <p className="mt-2 text-muted-foreground">{t.home.browseByDomainBlurb}</p>
+              </div>
             </div>
-          </div>
+          </Reveal>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {groups.map((g) => (
               <Link
@@ -144,15 +151,17 @@ export default async function HomePage() {
       {/* BEST SELLERS */}
       <section className="border-b border-border">
         <Container size="wide" className="py-16">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.home.mostPopular}</h2>
-              <p className="mt-2 text-muted-foreground">{t.home.mostPopularBlurb}</p>
+          <Reveal>
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.home.mostPopular}</h2>
+                <p className="mt-2 text-muted-foreground">{t.home.mostPopularBlurb}</p>
+              </div>
+              <Link href="/catalog" className="text-sm font-medium text-brand hover:underline">
+                {t.home.viewAll}
+              </Link>
             </div>
-            <Link href="/catalog" className="text-sm font-medium text-brand hover:underline">
-              {t.home.viewAll}
-            </Link>
-          </div>
+          </Reveal>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {featured.map((c) => (
               <CourseCard key={c.code} course={c} />
@@ -167,8 +176,10 @@ export default async function HomePage() {
       {/* TESTIMONIALS */}
       <section className="border-b border-border bg-muted/30">
         <Container size="wide" className="py-16">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.home.testimonials}</h2>
-          <p className="mt-2 text-muted-foreground">{t.home.testimonialsBlurb}</p>
+          <Reveal>
+            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.home.testimonials}</h2>
+            <p className="mt-2 text-muted-foreground">{t.home.testimonialsBlurb}</p>
+          </Reveal>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             {testimonials.map((tt) => (
               <figure key={tt.name} className="rounded-2xl border border-border bg-card p-6">
