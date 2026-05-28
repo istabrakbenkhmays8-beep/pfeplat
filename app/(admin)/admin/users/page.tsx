@@ -7,6 +7,8 @@ import {
   listUsersForAdmin,
 } from "@/src/repositories/userRepo";
 import { LEARNER_LEVELS, USER_ROLES, USER_STATUSES } from "@/src/models";
+import { getSession } from "@/lib/session";
+import { RoleCell, StatusCell } from "@/components/admin/UserRowActions";
 
 export const metadata = { title: "Manage users" };
 export const dynamic = "force-dynamic";
@@ -21,7 +23,9 @@ type SearchParams = Promise<{
 
 export default async function AdminUsersPage({ searchParams }: { searchParams: SearchParams }) {
   const sp = await searchParams;
-  const countries = await listCountries();
+  const [session, countries] = await Promise.all([getSession(), listCountries()]);
+  const isSuper = session?.user?.role === "super_admin";
+  const meId = session?.user?.id;
   const filters = {
     q: sp.q?.trim() ?? "",
     role: isRole(sp.role) ? sp.role : ("all" as const),
@@ -156,6 +160,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: S
               <th className="px-4 py-3 text-start">Level</th>
               <th className="px-4 py-3 text-end">Courses joined</th>
               <th className="px-4 py-3 text-end">Coins</th>
+              <th className="px-4 py-3 text-start">Role</th>
               <th className="px-4 py-3 text-start">Status</th>
               <th className="px-4 py-3 text-start">Registered on</th>
             </tr>
@@ -177,17 +182,10 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: S
                   {u.walletCoins}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3">
-                  <span
-                    className={
-                      u.status === "active"
-                        ? "rounded-full bg-success/10 px-2 py-0.5 text-xs font-medium text-success"
-                        : u.status === "disabled" || u.status === "banned"
-                        ? "rounded-full bg-danger/10 px-2 py-0.5 text-xs font-medium text-danger"
-                        : "rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
-                    }
-                  >
-                    {u.status}
-                  </span>
+                  <RoleCell userId={u.id} role={u.role} canChange={isSuper && u.id !== meId} />
+                </td>
+                <td className="whitespace-nowrap px-4 py-3">
+                  <StatusCell userId={u.id} status={u.status} canChange={u.id !== meId} />
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-xs text-muted-foreground">
                   {new Date(u.registeredOn).toLocaleDateString("en-GB", {
@@ -200,7 +198,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: S
             ))}
             {users.length === 0 && (
               <tr>
-                <td colSpan={11} className="px-4 py-12 text-center text-sm text-muted-foreground">
+                <td colSpan={12} className="px-4 py-12 text-center text-sm text-muted-foreground">
                   No users match these filters.
                 </td>
               </tr>

@@ -7,6 +7,7 @@ import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { MobileNavToggle } from "./MobileNavToggle";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { UserMenu } from "./UserMenu";
+import { getT } from "@/src/i18n/server";
 
 type Nav = { href: string; label: string };
 
@@ -19,6 +20,7 @@ export async function Header({
 }) {
   const c = await cookies();
   const locale = c.get("locale")?.value ?? "en";
+  const { t } = await getT();
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-surface/85 backdrop-blur supports-[backdrop-filter]:bg-surface/70">
@@ -54,14 +56,24 @@ export async function Header({
 
           {variant === "public" && (
             <div className="hidden md:block ms-auto w-full max-w-sm">
-              <SearchBar size="sm" placeholder="Search courses…" />
+              <SearchBar size="sm" placeholder={t.common.searchPlaceholder} />
             </div>
           )}
 
           <div className={variant === "public" ? "flex items-center gap-2" : "ms-auto flex items-center gap-2"}>
             <LanguageSwitcher current={locale} />
             <ThemeToggle />
-            <UserMenu variant={variant} />
+            <UserMenu
+              variant={variant}
+              labels={{
+                signIn: t.common.signIn,
+                getStarted: t.common.getStarted,
+                dashboard: t.common.dashboard,
+                coins: t.common.coins,
+                profile: t.common.profile,
+                signOut: t.common.signOut,
+              }}
+            />
           </div>
         </div>
       </Container>

@@ -9,6 +9,7 @@ import {
   getFeaturedCourses,
   headlineStats,
 } from "@/src/repositories/courseRepo";
+import { getT } from "@/src/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -70,12 +71,19 @@ const testimonials = [
 ];
 
 export default async function HomePage() {
-  const [stats, vendors, groups, featured] = await Promise.all([
+  const [{ t }, stats, vendors, groups, featured] = await Promise.all([
+    getT(),
     headlineStats(),
     countByVendor(),
     countByGroup(),
     getFeaturedCourses(8),
   ]);
+
+  const learningFormatsLocalised = [
+    { ...learningFormats[0], title: t.home.onSiteTitle, body: t.home.onSiteBody },
+    { ...learningFormats[1], title: t.home.liveOnlineTitle, body: t.home.liveOnlineBody },
+    { ...learningFormats[2], title: t.home.corporateTitle, body: t.home.corporateBody },
+  ];
 
   return (
     <>
@@ -94,19 +102,16 @@ export default async function HomePage() {
             <div className="lg:col-span-7">
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted-foreground">
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand" />
-                Leader in IT certification across Tunisia · Morocco · France · Côte d&apos;Ivoire
+                {t.home.badge}
               </span>
               <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-                Boost your career.{" "}
-                <span className="text-brand">Get certified.</span>
+                {t.home.heroTitle1}{" "}
+                <span className="text-brand">{t.home.heroTitleAccent}</span>
               </h1>
-              <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-                Authorized training and certifications from Microsoft, Cisco, Fortinet, EC-Council, PECB,
-                PMI and more. Learn online or on-site, earn rewards as you progress, and get a real certificate.
-              </p>
+              <p className="mt-5 max-w-2xl text-lg text-muted-foreground">{t.home.heroSubtitle}</p>
 
               <div className="mt-7 max-w-xl">
-                <SearchBar size="lg" placeholder="Search courses, vendors, certifications…" />
+                <SearchBar size="lg" placeholder={t.common.searchPlaceholder} />
               </div>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -114,7 +119,7 @@ export default async function HomePage() {
                   href="/catalog"
                   className="inline-flex h-12 items-center justify-center rounded-md bg-brand px-6 text-sm font-semibold text-brand-foreground hover:bg-brand-600"
                 >
-                  Browse all courses
+                  {t.home.browseCourses}
                 </Link>
                 <Link
                   href="/reference/planning-formation-juin-2026.pdf"
@@ -126,7 +131,7 @@ export default async function HomePage() {
                     <polyline points="7 10 12 15 17 10" />
                     <line x1="12" y1="15" x2="12" y2="3" />
                   </svg>
-                  Download June 2026 planning
+                  {t.home.downloadPlanning}
                 </Link>
               </div>
             </div>
@@ -147,8 +152,8 @@ export default async function HomePage() {
                   </div>
                 </div>
                 <div className="p-4">
-                  <p className="text-sm font-semibold">Watch the 90-second tour</p>
-                  <p className="text-xs text-muted-foreground">See how learners earn coins, certificates, and book sessions.</p>
+                  <p className="text-sm font-semibold">{t.home.watchTour}</p>
+                  <p className="text-xs text-muted-foreground">{t.home.watchTourBody}</p>
                 </div>
               </div>
             </div>
@@ -159,13 +164,13 @@ export default async function HomePage() {
       {/* LES CHIFFRES */}
       <section className="border-b border-border">
         <Container size="wide" className="py-14">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">By the numbers</h2>
-          <p className="mt-2 text-muted-foreground">Trusted by thousands of learners and dozens of enterprise customers.</p>
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.home.byTheNumbers}</h2>
+          <p className="mt-2 text-muted-foreground">{t.home.byTheNumbersBlurb}</p>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <KpiCard value={`${stats.yearsOfExperience}+`} label="Years of expertise" hint="Leader of IT certification in Tunisia" />
-            <KpiCard value={`${stats.courses}+`} label="Courses available" hint="In our June 2026 schedule" />
-            <KpiCard value={`${stats.vendors}`} label="Authorized partners" hint="Microsoft, Cisco, EC-Council…" />
-            <KpiCard value={`${stats.domains}`} label="Competency domains" hint="From Cloud to Cybersecurity" />
+            <KpiCard value={`${stats.yearsOfExperience}+`} label={t.home.yearsExpertise} hint={t.home.yearsExpertiseHint} />
+            <KpiCard value={`${stats.courses}+`} label={t.home.coursesAvailable} hint={t.home.coursesAvailableHint} />
+            <KpiCard value={`${stats.vendors}`} label={t.home.authorizedPartners} hint={t.home.authorizedPartnersHint} />
+            <KpiCard value={`${stats.domains}`} label={t.home.competencyDomains} hint={t.home.competencyDomainsHint} />
           </div>
         </Container>
       </section>
@@ -173,10 +178,10 @@ export default async function HomePage() {
       {/* LEARNING FORMATS */}
       <section className="border-b border-border">
         <Container size="wide" className="py-16">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Three ways to learn</h2>
-          <p className="mt-2 text-muted-foreground">Pick the format that fits your team and your pace.</p>
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.home.threeWays}</h2>
+          <p className="mt-2 text-muted-foreground">{t.home.threeWaysBlurb}</p>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {learningFormats.map((f) => (
+            {learningFormatsLocalised.map((f) => (
               <div key={f.title} className="rounded-2xl border border-border bg-card p-6">
                 <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand/10 text-brand">
                   {f.icon}

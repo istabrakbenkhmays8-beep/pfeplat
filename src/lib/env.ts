@@ -5,6 +5,8 @@ const schema = z.object({
   NEXTAUTH_SECRET: z.string().min(16).default("dev-nextauth-secret-change-me-32+chars-please"),
   NEXTAUTH_URL: z.string().url().default("http://localhost:3000"),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  ANTHROPIC_API_KEY: z.string().optional(),
+  ANTHROPIC_MODEL: z.string().default("claude-3-5-haiku-20241022"),
 });
 
 let cached: z.infer<typeof schema> | null = null;

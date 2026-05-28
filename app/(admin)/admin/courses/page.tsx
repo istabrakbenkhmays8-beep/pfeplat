@@ -31,13 +31,12 @@ export default async function AdminCoursesPage({ searchParams }: { searchParams:
           <h1 className="text-2xl font-bold tracking-tight">Manage courses</h1>
           <p className="text-sm text-muted-foreground">{courses.length} courses in the catalog.</p>
         </div>
-        <button
-          type="button"
-          disabled
-          className="inline-flex h-10 items-center rounded-md bg-brand px-4 text-sm font-semibold text-brand-foreground opacity-60"
+        <Link
+          href="/admin/courses/new"
+          className="inline-flex h-10 items-center rounded-md bg-brand px-4 text-sm font-semibold text-brand-foreground hover:bg-brand-600"
         >
-          + Add course (soon)
-        </button>
+          + Add course
+        </Link>
       </header>
 
       <form action="/admin/courses" method="get" className="max-w-md">
@@ -106,15 +105,14 @@ export default async function AdminCoursesPage({ searchParams }: { searchParams:
                   )}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3">
-                  <button
-                    type="button"
-                    disabled
-                    aria-label="Edit"
-                    title="Edit (coming soon)"
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground opacity-50 hover:bg-muted"
+                  <Link
+                    href={`/admin/courses/${encodeURIComponent(c.code)}/edit`}
+                    aria-label={`Edit ${c.code}`}
+                    title="Edit"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-fg"
                   >
                     <Pencil className="h-4 w-4" />
-                  </button>
+                  </Link>
                 </td>
               </tr>
             ))}

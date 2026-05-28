@@ -5,7 +5,25 @@ import { signOut, useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { LogOut, LayoutDashboard, Coins, UserCircle2 } from "lucide-react";
 
-export function UserMenu({ variant }: { variant: "public" | "app" }) {
+type Labels = {
+  signIn: string;
+  getStarted: string;
+  dashboard: string;
+  coins: string;
+  profile: string;
+  signOut: string;
+};
+
+const DEFAULT_LABELS: Labels = {
+  signIn: "Sign in",
+  getStarted: "Get started",
+  dashboard: "Dashboard",
+  coins: "Coins",
+  profile: "Profile",
+  signOut: "Sign out",
+};
+
+export function UserMenu({ variant, labels = DEFAULT_LABELS }: { variant: "public" | "app"; labels?: Labels }) {
   const { data, status } = useSession();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -31,13 +49,13 @@ export function UserMenu({ variant }: { variant: "public" | "app" }) {
           href="/auth/login"
           className="hidden sm:inline-flex h-9 items-center rounded-md px-3 text-sm font-medium text-fg hover:bg-muted"
         >
-          Sign in
+          {labels.signIn}
         </Link>
         <Link
           href="/auth/register"
           className="inline-flex h-9 items-center rounded-md bg-brand px-3 text-sm font-medium text-brand-foreground hover:bg-brand-600"
         >
-          Get started
+          {labels.getStarted}
         </Link>
       </>
     );
@@ -92,19 +110,19 @@ export function UserMenu({ variant }: { variant: "public" | "app" }) {
                 className="flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-muted"
               >
                 <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
-                Dashboard
+                {labels.dashboard}
               </Link>
             </li>
             {user.role === "user" && (
               <li>
                 <Link
-                  href="/dashboard"
+                  href="/wallet"
                   role="menuitem"
                   className="flex items-center justify-between gap-3 rounded-md px-3 py-2 text-sm hover:bg-muted"
                 >
                   <span className="flex items-center gap-3">
                     <Coins className="h-4 w-4 text-muted-foreground" />
-                    Coins
+                    {labels.coins}
                   </span>
                   <span className="font-semibold text-brand">{user.walletCoins}</span>
                 </Link>
@@ -117,7 +135,7 @@ export function UserMenu({ variant }: { variant: "public" | "app" }) {
                 className="flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-muted"
               >
                 <UserCircle2 className="h-4 w-4 text-muted-foreground" />
-                Profile
+                {labels.profile}
               </Link>
             </li>
             <li>
@@ -128,7 +146,7 @@ export function UserMenu({ variant }: { variant: "public" | "app" }) {
                 className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-fg hover:bg-muted"
               >
                 <LogOut className="h-4 w-4 text-muted-foreground" />
-                Sign out
+                {labels.signOut}
               </button>
             </li>
           </ul>

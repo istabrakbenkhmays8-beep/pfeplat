@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Container } from "./Container";
+import { getT } from "@/src/i18n/server";
 
 type Office = {
   country: string;
@@ -36,8 +37,9 @@ const offices: Office[] = [
   },
 ];
 
-export function Footer() {
+export async function Footer() {
   const year = new Date().getFullYear();
+  const { t } = await getT();
   return (
     <footer className="border-t border-border bg-surface mt-16">
       <Container size="wide">
@@ -52,9 +54,7 @@ export function Footer() {
                 className="h-9 w-auto"
               />
             </span>
-            <p className="mt-4 max-w-sm text-sm text-muted-foreground">
-              Boost your career. Get certified. Online and on-site training with real certificates and rewards as you progress.
-            </p>
+            <p className="mt-4 max-w-sm text-sm text-muted-foreground">{t.footer.tagline}</p>
             <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
               {["Microsoft Gold", "Cisco Learning", "Fortinet", "EC-Council", "PECB", "PMI"].map((p) => (
                 <span key={p} className="rounded-full border border-border px-2 py-1">{p}</span>
@@ -63,7 +63,7 @@ export function Footer() {
           </div>
 
           <div className="lg:col-span-2">
-            <h4 className="mb-4 text-sm font-semibold">Our offices</h4>
+            <h4 className="mb-4 text-sm font-semibold">{t.footer.ourOffices}</h4>
             <div className="grid gap-6 sm:grid-cols-2">
               {offices.map((o) => (
                 <div key={o.country}>
@@ -88,7 +88,7 @@ export function Footer() {
         </div>
 
         <div className="flex flex-col gap-3 border-t border-border py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {year} Advancia Training. All rights reserved.</p>
+          <p>© {year} Advancia Training. {t.footer.allRightsReserved}</p>
           <div className="flex flex-wrap items-center gap-4">
             <Link href="/catalog" className="hover:text-fg">Courses</Link>
             <Link href="/contact" className="hover:text-fg">Contact</Link>
