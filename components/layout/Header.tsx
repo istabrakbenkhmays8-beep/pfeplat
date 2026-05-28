@@ -1,20 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { Container } from "./Container";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { MobileNavToggle } from "./MobileNavToggle";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { UserMenu } from "./UserMenu";
 
 type Nav = { href: string; label: string };
 
-export function Header({
+export async function Header({
   variant = "public",
   nav = [],
 }: {
   variant?: "public" | "app";
   nav?: Nav[];
 }) {
+  const c = await cookies();
+  const locale = c.get("locale")?.value ?? "en";
+
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-surface/85 backdrop-blur supports-[backdrop-filter]:bg-surface/70">
       <Container size="wide">
@@ -54,6 +59,7 @@ export function Header({
           )}
 
           <div className={variant === "public" ? "flex items-center gap-2" : "ms-auto flex items-center gap-2"}>
+            <LanguageSwitcher current={locale} />
             <ThemeToggle />
             <UserMenu variant={variant} />
           </div>

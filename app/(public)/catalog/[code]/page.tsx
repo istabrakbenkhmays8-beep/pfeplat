@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/layout/Container";
 import { VendorBadge } from "@/components/ui/VendorBadge";
 import { CourseCard } from "@/components/cards/CourseCard";
+import { EnrollButton } from "@/components/course/EnrollButton";
 import {
   getCourseByCode,
   searchCatalog,
@@ -122,9 +123,7 @@ export default async function CourseDetailPage({ params }: { params: RouteParams
                 <hr className="my-5 border-border" />
 
                 <div className="flex flex-col gap-2">
-                  <button type="button" className="inline-flex h-11 w-full items-center justify-center rounded-md bg-brand text-sm font-semibold text-brand-foreground hover:bg-brand-600">
-                    Enroll now
-                  </button>
+                  <EnrollButton courseCode={course.code} />
                   <Link href="/contact" className="inline-flex h-11 w-full items-center justify-center rounded-md border border-border bg-surface text-sm font-semibold text-fg hover:bg-muted">
                     Request a quote
                   </Link>
