@@ -32,12 +32,13 @@ export async function VideoHero() {
         <source src={VIDEO_FALLBACK} type="video/mp4" />
       </video>
 
+      {/* Subtle neutral overlay — just enough for white text to stay legible without tinting the video. */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10"
         style={{
           background:
-            "linear-gradient(135deg, rgba(184,5,16,0.85) 0%, rgba(138,4,12,0.78) 45%, rgba(0,0,0,0.55) 100%)",
+            "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.20) 40%, rgba(0,0,0,0.55) 100%)",
         }}
       />
 

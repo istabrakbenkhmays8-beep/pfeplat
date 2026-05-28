@@ -7,6 +7,7 @@ import {
   listVendors,
   listGroups,
 } from "@/src/repositories/courseRepo";
+import { getT } from "@/src/i18n/server";
 
 export const metadata = { title: "Courses" };
 export const dynamic = "force-dynamic";
@@ -20,7 +21,7 @@ type SearchParams = Promise<{
 export default async function CatalogPage({ searchParams }: { searchParams: SearchParams }) {
   const sp = await searchParams;
   const q = sp.q?.trim() ?? "";
-  const [vendors, groups] = await Promise.all([listVendors(), listGroups()]);
+  const [{ t }, vendors, groups] = await Promise.all([getT(), listVendors(), listGroups()]);
   const vendor = sp.vendor && vendors.includes(sp.vendor) ? sp.vendor : "all";
   const group = sp.group && groups.includes(sp.group) ? sp.group : "all";
 
@@ -28,26 +29,24 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
 
   const activeFilters = [
     q && { label: `"${q}"`, href: pathWithout("q", { q, vendor, group }) },
-    vendor !== "all" && { label: `Partner: ${vendor}`, href: pathWithout("vendor", { q, vendor, group }) },
-    group !== "all" && { label: `Domain: ${group}`, href: pathWithout("group", { q, vendor, group }) },
+    vendor !== "all" && { label: `${t.catalog.partner}: ${vendor}`, href: pathWithout("vendor", { q, vendor, group }) },
+    group !== "all" && { label: `${t.catalog.domain}: ${group}`, href: pathWithout("group", { q, vendor, group }) },
   ].filter(Boolean) as Array<{ label: string; href: string }>;
 
   return (
     <Container size="wide" className="py-10">
       <header className="max-w-3xl">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Course catalog</h1>
-        <p className="mt-2 text-muted-foreground">
-          Browse our certification tracks across {vendors.length} authorized partners and {groups.length} domains.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{t.catalog.title}</h1>
+        <p className="mt-2 text-muted-foreground">{t.catalog.subtitle}</p>
       </header>
 
       <div className="mt-6 max-w-3xl">
-        <SearchBar defaultValue={q} size="md" placeholder="Search courses, vendors, certifications…" />
+        <SearchBar defaultValue={q} size="md" placeholder={t.common.searchPlaceholder} />
       </div>
 
       {activeFilters.length > 0 && (
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="text-xs text-muted-foreground">Filters:</span>
+          <span className="text-xs text-muted-foreground">{t.catalog.filtersLabel}</span>
           {activeFilters.map((f) => (
             <Link
               key={f.label}
@@ -62,7 +61,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
             </Link>
           ))}
           <Link href="/catalog" className="ms-2 text-xs font-medium text-brand hover:underline">
-            Clear all
+            {t.catalog.clearFilters}
           </Link>
         </div>
       )}
@@ -70,15 +69,15 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
       <div className="mt-8 grid gap-8 lg:grid-cols-[260px_1fr]">
         <aside className="space-y-6">
           <FilterGroup
-            title="Partner"
-            items={[{ value: "all", label: "All partners" }, ...vendors.map((v) => ({ value: v, label: v }))]}
+            title={t.catalog.partner}
+            items={[{ value: "all", label: t.catalog.allPartners }, ...vendors.map((v) => ({ value: v, label: v }))]}
             paramKey="vendor"
             current={vendor}
             existing={{ q, vendor, group }}
           />
           <FilterGroup
-            title="Domain"
-            items={[{ value: "all", label: "All domains" }, ...groups.map((g) => ({ value: g, label: g }))]}
+            title={t.catalog.domain}
+            items={[{ value: "all", label: t.catalog.allDomains }, ...groups.map((g) => ({ value: g, label: g }))]}
             paramKey="group"
             current={group}
             existing={{ q, vendor, group }}
@@ -88,15 +87,15 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
         <section>
           <div className="mb-4 flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              {results.length} {results.length === 1 ? "course" : "courses"} found
+              {results.length} {results.length === 1 ? t.catalog.found : t.catalog.foundPlural}
             </p>
           </div>
           {results.length === 0 ? (
             <div className="rounded-xl border border-border bg-card p-12 text-center">
-              <p className="text-lg font-semibold">No courses match these filters</p>
-              <p className="mt-1 text-sm text-muted-foreground">Try a different search term or clear the filters.</p>
+              <p className="text-lg font-semibold">{t.catalog.noMatch}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{t.catalog.noMatchHelp}</p>
               <Link href="/catalog" className="mt-4 inline-block text-sm font-medium text-brand hover:underline">
-                Clear filters →
+                {t.catalog.clearFilters}
               </Link>
             </div>
           ) : (

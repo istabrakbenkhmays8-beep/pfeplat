@@ -1,9 +1,13 @@
 import Link from "next/link";
+import { Flame } from "lucide-react";
 import { Types } from "mongoose";
 import { getSession } from "@/lib/session";
 import { connectDb } from "@/lib/db";
 import { Enrollment, User } from "@/src/models";
 import { listUserEnrollments } from "@/src/services/enrollmentService";
+import { awardBadgesIfDue } from "@/src/services/gamificationService";
+import { getBadgeMeta } from "@/lib/badges";
+import { getT } from "@/src/i18n/server";
 
 export const metadata = { title: "Dashboard" };
 export const dynamic = "force-dynamic";
@@ -13,10 +17,17 @@ export default async function UserDashboardPage() {
   if (!session) return null;
   const firstName = session.user.name?.split(" ")[0] ?? "there";
 
+  const { t } = await getT();
   await connectDb();
   const uid = new Types.ObjectId(session.user.id);
-  const [user, inProgress, completedCount, recent] = await Promise.all([
-    User.findById(uid).select("walletCoins").lean(),
+  const userDoc = await User.findById(uid);
+  if (!userDoc) return null;
+
+  // Re-evaluate badges on each dashboard load (cheap, idempotent).
+  await awardBadgesIfDue(userDoc);
+  await userDoc.save();
+
+  const [inProgress, completedCount, recent] = await Promise.all([
     Enrollment.countDocuments({ user: uid, status: "active" }),
     Enrollment.countDocuments({ user: uid, status: "completed" }),
     listUserEnrollments(session.user.id).then((rows) => rows.slice(0, 3)),
@@ -24,16 +35,26 @@ export default async function UserDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-bold tracking-tight">Welcome back, {firstName}.</h1>
-        <p className="text-sm text-muted-foreground">Pick up where you left off.</p>
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {t.userDash.welcome}, {firstName}.
+          </h1>
+          <p className="text-sm text-muted-foreground">{t.userDash.pickUp}</p>
+        </div>
+        {(userDoc.currentStreak ?? 0) > 0 && (
+          <div className="inline-flex items-center gap-2 rounded-full border border-orange-300 bg-orange-50 px-3 py-1.5 text-sm font-semibold text-orange-900 dark:border-orange-500/40 dark:bg-orange-500/10 dark:text-orange-200">
+            <Flame className="h-4 w-4" />
+            {userDoc.currentStreak}-day streak · longest {userDoc.longestStreak ?? userDoc.currentStreak}
+          </div>
+        )}
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {[
-          { label: "Courses in progress", value: String(inProgress), href: "/my-courses" },
-          { label: "Coins earned", value: String(user?.walletCoins ?? 0), href: "/wallet" },
-          { label: "Certificates", value: String(completedCount), href: "/certificates" },
+          { label: t.userDash.inProgress, value: String(inProgress), href: "/my-courses" },
+          { label: t.userDash.coinsEarned, value: String(userDoc.walletCoins ?? 0), href: "/wallet" },
+          { label: t.userDash.certificates, value: String(completedCount), href: "/certificates" },
         ].map((k) => (
           <Link
             key={k.label}
@@ -46,24 +67,44 @@ export default async function UserDashboardPage() {
         ))}
       </div>
 
+      {(userDoc.badges ?? []).length > 0 && (
+        <section>
+          <h2 className="mb-3 text-lg font-semibold">Badges earned</h2>
+          <ul className="flex flex-wrap gap-2">
+            {(userDoc.badges as any[]).map((b: any) => {
+              const meta = getBadgeMeta(b.code);
+              if (!meta) return null;
+              return (
+                <li
+                  key={b.code}
+                  title={meta.description}
+                  className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ${meta.tone}`}
+                >
+                  <span aria-hidden className="text-base leading-none">{meta.emoji}</span>
+                  {meta.label}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+
       {recent.length === 0 ? (
         <div className="rounded-xl border border-border bg-card p-10 text-center">
-          <p className="text-sm text-muted-foreground">
-            You haven&apos;t enrolled in any course yet.
-          </p>
+          <p className="text-sm text-muted-foreground">{t.userDash.noEnrollments}</p>
           <Link
             href="/catalog"
             className="mt-4 inline-flex h-10 items-center rounded-md bg-brand px-4 text-sm font-semibold text-brand-foreground hover:bg-brand-600"
           >
-            Browse courses
+            {t.userDash.browseCourses}
           </Link>
         </div>
       ) : (
         <section>
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Continue learning</h2>
+            <h2 className="text-lg font-semibold">{t.userDash.continueLearning}</h2>
             <Link href="/my-courses" className="text-sm font-medium text-brand hover:underline">
-              View all →
+              {t.userDash.viewAll}
             </Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

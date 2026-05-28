@@ -51,8 +51,12 @@ export const authOptions: NextAuthOptions = {
         if (u.status === "disabled" || u.status === "banned") return null;
         const ok = await bcrypt.compare(credentials.password, u.passwordHash);
         if (!ok) return null;
-        // Fire-and-forget last login update.
+        // Fire-and-forget last login update + streak / badge refresh.
         User.updateOne({ _id: u._id }, { $set: { lastLoginAt: new Date() } }).catch(() => {});
+        // Streak update — async, don't block sign-in.
+        import("@/src/services/gamificationService")
+          .then(({ recordActivity }) => recordActivity(String(u._id)))
+          .catch(() => {});
         return {
           id: String(u._id),
           email: u.email,

@@ -1,0 +1,6 @@
+# Don't deploy the mobile app or local-only artifacts to Vercel.
+mobile/
+reference/
+_brand-source/
+.smoke.pid
+.pr-body.md

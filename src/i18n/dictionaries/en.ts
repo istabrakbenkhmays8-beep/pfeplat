@@ -110,6 +110,48 @@ export type Dictionary = {
     ourOffices: string;
     allRightsReserved: string;
   };
+  catalog: {
+    title: string;
+    subtitle: string;
+    found: string;
+    foundPlural: string;
+    noMatch: string;
+    noMatchHelp: string;
+    clearFilters: string;
+    filtersLabel: string;
+    partner: string;
+    allPartners: string;
+    domain: string;
+    allDomains: string;
+  };
+  detail: {
+    onlineOrOnsite: string;
+    officialCert: string;
+    nextSession: string;
+    scheduleLabel: string;
+    contactUsForSchedule: string;
+    enrollNow: string;
+    requestQuote: string;
+    whatYoullLearn: string;
+    moreFrom: string;
+    seeAllVendor: string;
+  };
+  calendarPage: {
+    title: string;
+    subtitle: string;
+    downloadFullPlanning: string;
+  };
+  userDash: {
+    welcome: string;
+    pickUp: string;
+    inProgress: string;
+    coinsEarned: string;
+    certificates: string;
+    continueLearning: string;
+    viewAll: string;
+    noEnrollments: string;
+    browseCourses: string;
+  };
 };
 
 const en: Dictionary = {
@@ -241,6 +283,48 @@ const en: Dictionary = {
       "Boost your career. Get certified. Online and on-site training with real certificates and rewards as you progress.",
     ourOffices: "Our offices",
     allRightsReserved: "All rights reserved.",
+  },
+  catalog: {
+    title: "Course catalog",
+    subtitle: "Browse our certification tracks across our authorized partners and domains.",
+    found: "course found",
+    foundPlural: "courses found",
+    noMatch: "No courses match these filters",
+    noMatchHelp: "Try a different search term or clear the filters.",
+    clearFilters: "Clear filters →",
+    filtersLabel: "Filters:",
+    partner: "Partner",
+    allPartners: "All partners",
+    domain: "Domain",
+    allDomains: "All domains",
+  },
+  detail: {
+    onlineOrOnsite: "Online or on-site",
+    officialCert: "Official certificate",
+    nextSession: "Next session",
+    scheduleLabel: "Schedule",
+    contactUsForSchedule: "We'll arrange a session that fits your team.",
+    enrollNow: "Enroll now",
+    requestQuote: "Request a quote",
+    whatYoullLearn: "What you'll learn",
+    moreFrom: "More from",
+    seeAllVendor: "See all courses →",
+  },
+  calendarPage: {
+    title: "Training calendar",
+    subtitle: "Sessions scheduled across all our domains. Click any course to see details and reserve a seat.",
+    downloadFullPlanning: "Download the full planning (PDF)",
+  },
+  userDash: {
+    welcome: "Welcome back",
+    pickUp: "Pick up where you left off.",
+    inProgress: "Courses in progress",
+    coinsEarned: "Coins earned",
+    certificates: "Certificates",
+    continueLearning: "Continue learning",
+    viewAll: "View all →",
+    noEnrollments: "You haven't enrolled in any course yet.",
+    browseCourses: "Browse courses",
   },
 };
 

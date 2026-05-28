@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Advancia Training",
+    "slug": "advancia-training",
+    "scheme": "advancia",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "backgroundColor": "#E30613",
+      "resizeMode": "contain"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "tn.advancia.training"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E30613"
+      },
+      "package": "tn.advancia.training"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "apiBase": "http://localhost:3000"
+    }
+  }
+}
