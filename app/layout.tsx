@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Noto_Sans_Arabic } from "next/font/google";
 import { cookies } from "next/headers";
+import { Toaster } from "react-hot-toast";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { SessionProvider } from "@/components/providers/SessionProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -71,7 +73,18 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
       </head>
       <body className="min-h-dvh bg-bg text-fg antialiased">
-        <ThemeProvider initialTheme={initialTheme}>{children}</ThemeProvider>
+        <SessionProvider>
+          <ThemeProvider initialTheme={initialTheme}>
+            {children}
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                className: "!bg-card !text-fg !border !border-border",
+                style: { background: "var(--color-card)", color: "var(--color-fg)" },
+              }}
+            />
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

@@ -2,10 +2,8 @@ import { z } from "zod";
 
 const schema = z.object({
   MONGODB_URI: z.string().min(1, "MONGODB_URI is required"),
-  JWT_ACCESS_SECRET: z.string().min(8).default("dev-access-secret-change-me"),
-  JWT_REFRESH_SECRET: z.string().min(8).default("dev-refresh-secret-change-me"),
-  JWT_ACCESS_TTL: z.string().default("15m"),
-  JWT_REFRESH_TTL: z.string().default("30d"),
+  NEXTAUTH_SECRET: z.string().min(16).default("dev-nextauth-secret-change-me-32+chars-please"),
+  NEXTAUTH_URL: z.string().url().default("http://localhost:3000"),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });
 

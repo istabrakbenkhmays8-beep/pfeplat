@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/layout/AppShell";
+import { requireRole } from "@/lib/session";
 
 const nav = [
   { href: "/admin", label: "Overview" },
@@ -11,7 +12,8 @@ const nav = [
   { href: "/admin/exports", label: "Exports" },
 ];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  await requireRole("admin");
   return (
     <AppShell navItems={nav} sidebarTitle="Admin">
       {children}

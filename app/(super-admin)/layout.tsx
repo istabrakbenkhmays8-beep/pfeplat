@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/layout/AppShell";
+import { requireRole } from "@/lib/session";
 
 const nav = [
   { href: "/super-admin", label: "Overview" },
@@ -9,7 +10,8 @@ const nav = [
   { href: "/super-admin/settings", label: "Settings" },
 ];
 
-export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
+export default async function SuperAdminLayout({ children }: { children: React.ReactNode }) {
+  await requireRole("super_admin");
   return (
     <AppShell navItems={nav} sidebarTitle="Super admin">
       {children}

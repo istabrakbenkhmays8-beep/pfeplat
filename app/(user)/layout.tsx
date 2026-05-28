@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/layout/AppShell";
+import { requireRole } from "@/lib/session";
 
 const nav = [
   { href: "/dashboard", label: "Overview" },
@@ -8,7 +9,8 @@ const nav = [
   { href: "/calendar", label: "Calendar" },
 ];
 
-export default function UserLayout({ children }: { children: React.ReactNode }) {
+export default async function UserLayout({ children }: { children: React.ReactNode }) {
+  await requireRole("user");
   return (
     <AppShell navItems={nav} sidebarTitle="Your learning">
       {children}

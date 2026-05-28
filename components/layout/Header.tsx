@@ -4,6 +4,7 @@ import { Container } from "./Container";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { MobileNavToggle } from "./MobileNavToggle";
 import { SearchBar } from "@/components/ui/SearchBar";
+import { UserMenu } from "./UserMenu";
 
 type Nav = { href: string; label: string };
 
@@ -54,30 +55,7 @@ export function Header({
 
           <div className={variant === "public" ? "flex items-center gap-2" : "ms-auto flex items-center gap-2"}>
             <ThemeToggle />
-            {variant === "public" ? (
-              <>
-                <Link
-                  href="/auth/login"
-                  className="hidden sm:inline-flex h-9 items-center rounded-md px-3 text-sm font-medium text-fg hover:bg-muted"
-                >
-                  Sign in
-                </Link>
-                <Link
-                  href="/auth/register"
-                  className="inline-flex h-9 items-center rounded-md bg-brand px-3 text-sm font-medium text-brand-foreground hover:bg-brand-600"
-                >
-                  Get started
-                </Link>
-              </>
-            ) : (
-              <button
-                type="button"
-                aria-label="Profile"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted text-fg"
-              >
-                <span className="text-sm font-medium">A</span>
-              </button>
-            )}
+            <UserMenu variant={variant} />
           </div>
         </div>
       </Container>
