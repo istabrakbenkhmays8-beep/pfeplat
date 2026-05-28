@@ -22,8 +22,58 @@ const fr: Dictionary = {
     formations: "Formations",
     calendrier: "Calendrier",
     certifications: "Certifications",
+    partners: "Partenaires",
     about: "Qui sommes-nous",
     contact: "Contact",
+  },
+  topbar: {
+    myAccount: "Mon compte",
+    loginOrRegister: "Connexion ou S'inscrire",
+  },
+  learning: {
+    sectionTitle: "Apprenez comme vous le souhaitez, partout dans le monde",
+    onsiteTitle: "Classe en présentiel",
+    onsiteBullets: [
+      "Apprenez comme vous le souhaitez, partout dans le monde.",
+      "Interagissez avec nos instructeurs et vos pairs dans la salle.",
+      "Choisissez le centre de formation le plus près de chez vous.",
+    ],
+    remoteTitle: "Classe à distance",
+    remoteBullets: [
+      "Faites l'expérience d'une formation en ligne animée par un instructeur.",
+      "Tout comme en salle de classe, participez aux échanges avec nos formateurs et apprenants.",
+      "Découvrez la flexibilité de notre plate-forme.",
+    ],
+    corporateTitle: "Intra-entreprise",
+    corporateBullets: [
+      "Nous organisons vos sessions intra-entreprise dans nos locaux.",
+      "Au-delà de programmes de formation flexibles et adaptables.",
+      "Chaque formation est animée par un instructeur.",
+    ],
+    cta: "En savoir plus",
+  },
+  network: {
+    title: "Notre réseau",
+    sectionLabel: "Où nous trouver",
+  },
+  partners: {
+    sectionLabel: "Partenaires",
+    title: "Nos partenaires",
+  },
+  newsletter: {
+    title: "Newsletter",
+    body: "Abonnez-vous à la newsletter et recevez toutes les dernières mises à jour.",
+    placeholder: "E-mail",
+    subscribe: "S'inscrire",
+  },
+  footerExt: {
+    liensUtiles: "Liens utiles",
+    informations: "Informations",
+    contactCol: "Contact",
+    jobs: "Offre d'emploi",
+    presentation: "Présentation",
+    resources: "Ressource",
+    ourGroup: "Notre groupe",
   },
   home: {
     badge: "Leader de la certification IT en Tunisie · Maroc · France · Côte d’Ivoire",

@@ -59,6 +59,21 @@
   --color-danger: #ef4444;
 }
 
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@layer utilities {
+  .animate-marquee {
+    width: max-content;
+    animation: marquee 40s linear infinite;
+  }
+  [dir="rtl"] .animate-marquee {
+    animation-direction: reverse;
+  }
+}
+
 @layer base {
   html { color-scheme: light; }
   html.dark { color-scheme: dark; }

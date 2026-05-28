@@ -20,8 +20,46 @@ export type Dictionary = {
     formations: string;
     calendrier: string;
     certifications: string;
+    partners: string;
     about: string;
     contact: string;
+  };
+  topbar: {
+    myAccount: string;
+    loginOrRegister: string;
+  };
+  learning: {
+    sectionTitle: string;
+    onsiteTitle: string;
+    onsiteBullets: string[];
+    remoteTitle: string;
+    remoteBullets: string[];
+    corporateTitle: string;
+    corporateBullets: string[];
+    cta: string;
+  };
+  network: {
+    title: string;
+    sectionLabel: string;
+  };
+  partners: {
+    sectionLabel: string;
+    title: string;
+  };
+  newsletter: {
+    title: string;
+    body: string;
+    placeholder: string;
+    subscribe: string;
+  };
+  footerExt: {
+    liensUtiles: string;
+    informations: string;
+    contactCol: string;
+    jobs: string;
+    presentation: string;
+    resources: string;
+    ourGroup: string;
   };
   home: {
     badge: string;
@@ -95,8 +133,58 @@ const en: Dictionary = {
     formations: "Courses",
     calendrier: "Calendar",
     certifications: "Certifications",
-    about: "About",
+    partners: "Partners",
+    about: "About us",
     contact: "Contact",
+  },
+  topbar: {
+    myAccount: "My account",
+    loginOrRegister: "Sign in or register",
+  },
+  learning: {
+    sectionTitle: "Learn the way you want — anywhere in the world",
+    onsiteTitle: "In-person class",
+    onsiteBullets: [
+      "Learn the way you want, anywhere in the world.",
+      "Interact with our instructors and your peers in the room.",
+      "Pick the training centre nearest to you.",
+    ],
+    remoteTitle: "Remote class",
+    remoteBullets: [
+      "Take a live instructor-led training online.",
+      "Just like in the classroom: chat with trainers and learners.",
+      "Discover the flexibility of our platform.",
+    ],
+    corporateTitle: "Corporate (intra)",
+    corporateBullets: [
+      "We organise your in-house sessions on our premises.",
+      "Beyond off-the-shelf programmes: flexible and adaptable.",
+      "Every session is led by a certified instructor.",
+    ],
+    cta: "Learn more",
+  },
+  network: {
+    title: "Our network",
+    sectionLabel: "Where to find us",
+  },
+  partners: {
+    sectionLabel: "Partners",
+    title: "Our partners",
+  },
+  newsletter: {
+    title: "Newsletter",
+    body: "Subscribe to the newsletter and get all the latest updates.",
+    placeholder: "Email",
+    subscribe: "Subscribe",
+  },
+  footerExt: {
+    liensUtiles: "Useful links",
+    informations: "Information",
+    contactCol: "Contact",
+    jobs: "Job openings",
+    presentation: "About",
+    resources: "Resources",
+    ourGroup: "Our group",
   },
   home: {
     badge: "Leader in IT certification across Tunisia · Morocco · France · Côte d'Ivoire",

@@ -28,14 +28,14 @@ export async function Header({
         <div className="flex h-16 items-center gap-4">
           {variant === "app" && <MobileNavToggle />}
           <Link href="/" aria-label="Advancia Training — home" className="flex items-center">
-            <span className="inline-flex items-center rounded-md px-1 py-0.5 dark:bg-white">
+            <span className="inline-flex items-center rounded-md px-1.5 py-1 dark:bg-white">
               <Image
                 src="/brand/advancia-logo.png"
                 alt="Advancia Training"
                 width={175}
                 height={64}
                 priority
-                className="h-7 w-auto sm:h-8"
+                className="h-9 w-auto sm:h-10"
               />
             </span>
           </Link>
