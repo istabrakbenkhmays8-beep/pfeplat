@@ -3,11 +3,10 @@ import { requireRole } from "@/lib/session";
 
 const nav = [
   { href: "/super-admin", label: "Overview" },
-  { href: "/super-admin/admins", label: "Admins" },
+  { href: "/super-admin/sessions", label: "Sessions" },
   { href: "/super-admin/reservations", label: "Reservations" },
   { href: "/super-admin/trainers", label: "Trainers" },
   { href: "/super-admin/audit", label: "Audit log" },
-  { href: "/super-admin/settings", label: "Settings" },
 ];
 
 export default async function SuperAdminLayout({ children }: { children: React.ReactNode }) {

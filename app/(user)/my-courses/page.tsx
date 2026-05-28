@@ -82,7 +82,7 @@ export default async function MyCoursesPage() {
                 )}
               </div>
 
-              <div className="mt-auto flex gap-2 pt-4">
+              <div className="mt-auto flex flex-wrap gap-2 pt-4">
                 <Link
                   href={`/catalog/${encodeURIComponent(r.course.code)}`}
                   className="inline-flex flex-1 items-center justify-center rounded-md border border-border bg-surface px-3 py-2 text-xs font-medium hover:bg-muted"
@@ -90,7 +90,15 @@ export default async function MyCoursesPage() {
                   Open course
                 </Link>
                 {r.status !== "completed" && (
-                  <CompleteCourseButton enrollmentId={r.enrollmentId} />
+                  <>
+                    <Link
+                      href={`/assessment/${encodeURIComponent(r.course.code)}`}
+                      className="inline-flex items-center justify-center rounded-md border border-border bg-surface px-3 py-2 text-xs font-medium hover:bg-muted"
+                    >
+                      Take assessment
+                    </Link>
+                    <CompleteCourseButton enrollmentId={r.enrollmentId} />
+                  </>
                 )}
               </div>
             </article>
