@@ -3,6 +3,7 @@ import { listUserCoinTransactions } from "@/src/services/enrollmentService";
 import { User } from "@/src/models";
 import { connectDb } from "@/lib/db";
 import { Types } from "mongoose";
+import { TunisianWallet, AdvanciaCoin } from "@/components/ui/PaymentArt";
 
 export const metadata = { title: "Coins & wallet" };
 export const dynamic = "force-dynamic";
@@ -32,10 +33,18 @@ export default async function WalletPage() {
         </p>
       </header>
 
-      <div className="rounded-2xl border border-border bg-gradient-to-br from-brand to-brand-700 p-6 text-brand-foreground">
-        <p className="text-sm opacity-90">Current balance</p>
-        <p className="mt-1 text-5xl font-bold">{user?.walletCoins ?? 0}</p>
-        <p className="mt-1 text-xs opacity-80">coins available</p>
+      <div className="grid gap-4 md:grid-cols-[1fr_minmax(260px,360px)]">
+        <div className="rounded-2xl border border-border bg-gradient-to-br from-brand to-brand-700 p-6 text-brand-foreground">
+          <p className="text-sm opacity-90">Current balance</p>
+          <p className="mt-1 flex items-baseline gap-2 text-5xl font-bold">
+            <AdvanciaCoin size={40} ariaLabel="Coin icon" />
+            {user?.walletCoins ?? 0}
+          </p>
+          <p className="mt-1 text-xs opacity-80">coins available · 1 coin = 0.10 DT off any course</p>
+        </div>
+        <div className="overflow-hidden rounded-2xl border border-border bg-card">
+          <TunisianWallet coins={user?.walletCoins ?? 0} />
+        </div>
       </div>
 
       <section>
@@ -73,8 +82,10 @@ export default async function WalletPage() {
                         t.delta >= 0 ? "text-success" : "text-danger"
                       }`}
                     >
-                      {t.delta >= 0 ? "+" : ""}
-                      {t.delta}
+                      <span className="inline-flex items-center gap-1.5">
+                        {t.delta >= 0 ? "+" : ""}{t.delta}
+                        <AdvanciaCoin size={14} ariaLabel="" />
+                      </span>
                     </td>
                     <td className="whitespace-nowrap px-4 py-3 text-end text-muted-foreground">
                       {t.balanceAfter}

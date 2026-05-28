@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { CreditCard, Loader2 } from "lucide-react";
+import { AdvanciaCard, AdvanciaCoin } from "@/components/ui/PaymentArt";
 
 const COIN_VALUE_TND = 0.1;
 
@@ -59,9 +60,15 @@ export function CheckoutForm({
       }}
       className="space-y-4 rounded-xl border border-border bg-card p-6"
     >
+      <div className="mx-auto max-w-sm">
+        <AdvanciaCard last4={cardLast4} />
+      </div>
+
       <div>
         <div className="flex items-center justify-between text-sm">
-          <label htmlFor="coins" className="font-medium">Apply coins (1 coin = 0.10 DT off)</label>
+          <label htmlFor="coins" className="inline-flex items-center gap-1.5 font-medium">
+            <AdvanciaCoin size={16} ariaLabel="" /> Apply coins (1 coin = 0.10 DT off)
+          </label>
           <span className="font-semibold text-brand">−{totals.discount} DT</span>
         </div>
         <input
