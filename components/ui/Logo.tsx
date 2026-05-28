@@ -4,6 +4,8 @@ import { cn } from "@/lib/cn";
  * Inline SVG Advancia logo — crisp at any size, no rasterization.
  * Wordmark uses `currentColor` so it follows the surrounding text color
  * (light/dark theme via `auto`, forced white via `white`).
+ *
+ * viewBox 260×64. Aspect 4.0625 → width = round(height * 4.0625).
  */
 export function Logo({
   className,
@@ -17,8 +19,7 @@ export function Logo({
   variant?: "auto" | "white";
   ariaLabel?: string;
 }) {
-  // viewBox is 320×88 — preserve aspect.
-  const width = Math.round((320 / 88) * height);
+  const width = Math.round((260 / 64) * height);
 
   return (
     <span
@@ -31,7 +32,7 @@ export function Logo({
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 320 88"
+        viewBox="0 0 260 64"
         role="img"
         aria-label={ariaLabel}
         width={width}
@@ -39,46 +40,45 @@ export function Logo({
         className="block"
       >
         <title>{ariaLabel}</title>
-        {/* Red brand mark */}
-        <g transform="translate(8 8)">
-          <circle cx="36" cy="36" r="34" fill="none" stroke="#C70019" strokeWidth="4" />
-          <path
-            d="M36 8 a28 28 0 1 1 0 56 a28 28 0 1 1 0 -56 M28 22 L52 36 L28 50 Z"
-            fill="#C70019"
-            fillRule="evenodd"
-          />
+
+        {/* Red play-button mark */}
+        <g transform="translate(4 4)">
+          <circle cx="28" cy="28" r="28" fill="#C70019" />
+          <polygon points="23,16 23,40 41,28" fill="#FFFFFF" />
         </g>
 
         {/* ADVANCIA wordmark */}
-        <g transform="translate(96 0)" fill="currentColor">
+        <g transform="translate(72 0)" fill="currentColor">
           <text
             x="0"
-            y="50"
+            y="38"
             fontFamily="Inter, Helvetica, Arial, sans-serif"
             fontWeight="900"
-            fontSize="44"
-            letterSpacing="-1"
+            fontSize="32"
+            letterSpacing="-0.5"
           >
             ADVANCIA
           </text>
-          <circle cx="222" cy="20" r="6" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          {/* Registered mark — sits just above the baseline at the right edge of the wordmark */}
+          <circle cx="166" cy="16" r="5" fill="none" stroke="currentColor" strokeWidth="1.2" />
           <text
-            x="222"
-            y="24"
+            x="166"
+            y="19"
             textAnchor="middle"
             fontFamily="Inter, Helvetica, Arial, sans-serif"
-            fontSize="7"
+            fontSize="6"
             fontWeight="700"
           >
             R
           </text>
+          {/* TRAINING subtitle */}
           <text
-            x="0"
-            y="76"
+            x="2"
+            y="56"
             fontFamily="Inter, Helvetica, Arial, sans-serif"
-            fontWeight="500"
-            fontSize="13"
-            letterSpacing="9"
+            fontWeight="600"
+            fontSize="9"
+            letterSpacing="6"
           >
             TRAINING
           </text>
