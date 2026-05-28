@@ -1,11 +1,9 @@
-import Image from "next/image";
 import { cn } from "@/lib/cn";
 
 /**
- * The real Advancia logo (PNG provided by the user, copied to /public/brand/).
- * Rendered via Next/Image so it stays sharp on retina displays.
- *
- * In dark mode the logo sits on a small white pill so the dark wordmark stays readable.
+ * Inline SVG Advancia logo — crisp at any size, no rasterization.
+ * Wordmark uses `currentColor` so it follows the surrounding text color
+ * (light/dark theme via `auto`, forced white via `white`).
  */
 export function Logo({
   className,
@@ -15,47 +13,77 @@ export function Logo({
 }: {
   className?: string;
   height?: number;
-  /** "auto" = adds a white pill in dark mode. "light" = always on light bg (no pill). "white" = white-text alternative for dark backgrounds. */
-  variant?: "auto" | "light" | "white";
+  /** "auto" follows surrounding text color. "white" forces white text (for dark surfaces like the footer). */
+  variant?: "auto" | "white";
   ariaLabel?: string;
 }) {
-  // Approximate aspect from the original 175×64 source.
-  const width = Math.round((175 / 64) * height);
-
-  if (variant === "white") {
-    // Force a light backdrop pill so the dark wordmark in the PNG is legible on any background.
-    return (
-      <span className={cn("inline-flex items-center rounded-md bg-white px-2 py-1", className)}>
-        <Image
-          src="/brand/advancia-logo.png"
-          alt={ariaLabel}
-          width={width}
-          height={height}
-          priority
-          className="block h-auto w-auto"
-          style={{ height, width: "auto" }}
-        />
-      </span>
-    );
-  }
+  // viewBox is 320×88 — preserve aspect.
+  const width = Math.round((320 / 88) * height);
 
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-md",
-        variant === "auto" && "dark:bg-white dark:px-1.5 dark:py-0.5",
+        "inline-flex items-center",
+        variant === "white" ? "text-white" : "text-fg",
         className,
       )}
+      style={{ height, width }}
     >
-      <Image
-        src="/brand/advancia-logo.png"
-        alt={ariaLabel}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 320 88"
+        role="img"
+        aria-label={ariaLabel}
         width={width}
         height={height}
-        priority
-        className="block h-auto w-auto"
-        style={{ height, width: "auto" }}
-      />
+        className="block"
+      >
+        <title>{ariaLabel}</title>
+        {/* Red brand mark */}
+        <g transform="translate(8 8)">
+          <circle cx="36" cy="36" r="34" fill="none" stroke="#C70019" strokeWidth="4" />
+          <path
+            d="M36 8 a28 28 0 1 1 0 56 a28 28 0 1 1 0 -56 M28 22 L52 36 L28 50 Z"
+            fill="#C70019"
+            fillRule="evenodd"
+          />
+        </g>
+
+        {/* ADVANCIA wordmark */}
+        <g transform="translate(96 0)" fill="currentColor">
+          <text
+            x="0"
+            y="50"
+            fontFamily="Inter, Helvetica, Arial, sans-serif"
+            fontWeight="900"
+            fontSize="44"
+            letterSpacing="-1"
+          >
+            ADVANCIA
+          </text>
+          <circle cx="222" cy="20" r="6" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          <text
+            x="222"
+            y="24"
+            textAnchor="middle"
+            fontFamily="Inter, Helvetica, Arial, sans-serif"
+            fontSize="7"
+            fontWeight="700"
+          >
+            R
+          </text>
+          <text
+            x="0"
+            y="76"
+            fontFamily="Inter, Helvetica, Arial, sans-serif"
+            fontWeight="500"
+            fontSize="13"
+            letterSpacing="9"
+          >
+            TRAINING
+          </text>
+        </g>
+      </svg>
     </span>
   );
 }

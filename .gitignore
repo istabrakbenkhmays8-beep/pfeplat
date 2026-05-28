@@ -58,3 +58,5 @@ _brand-source/
 
 # transient PR body file
 .pr-body.md
+
+.vercel
