@@ -1,27 +1,11 @@
 import { Container } from "@/components/layout/Container";
+import { PARTNER_MARKS } from "@/components/ui/PartnerMarks";
 import { getT } from "@/src/i18n/server";
-
-const PARTNERS = [
-  "Microsoft Gold Partner",
-  "Cisco Learning Partner",
-  "VMware Authorized",
-  "Fortinet Authorized",
-  "EC-Council",
-  "PECB",
-  "PeopleCert",
-  "PMI",
-  "PaloAlto",
-  "IBM",
-  "Pearson VUE",
-  "PSI",
-  "CompTIA",
-  "Kaspersky",
-];
 
 export async function PartnersCarousel() {
   const { t } = await getT();
   // Duplicate the list so the marquee can loop seamlessly.
-  const items = [...PARTNERS, ...PARTNERS];
+  const items = [...PARTNER_MARKS, ...PARTNER_MARKS];
 
   return (
     <section id="partners" className="border-y border-border bg-card">
@@ -30,23 +14,20 @@ export async function PartnersCarousel() {
           <p className="text-xs font-semibold uppercase tracking-widest text-brand">
             {t.partners.sectionLabel}
           </p>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-            {t.partners.title}
-          </h2>
+          <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{t.partners.title}</h2>
         </div>
 
         <div className="relative mt-10 overflow-hidden">
-          {/* edge fades */}
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-card to-transparent" />
           <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-card to-transparent" />
 
-          <ul className="flex gap-4 animate-marquee group-hover:[animation-play-state:paused] hover:[animation-play-state:paused]">
-            {items.map((p, i) => (
+          <ul className="flex items-center gap-6 animate-marquee">
+            {items.map((Mark, i) => (
               <li
-                key={`${p}-${i}`}
-                className="flex h-24 w-48 flex-shrink-0 items-center justify-center rounded-xl border border-border bg-surface px-4 text-center"
+                key={i}
+                className="flex h-24 w-48 flex-shrink-0 items-center justify-center rounded-xl border border-border bg-surface px-4 text-fg"
               >
-                <span className="text-sm font-semibold text-fg/80">{p}</span>
+                <Mark />
               </li>
             ))}
           </ul>

@@ -83,6 +83,7 @@ const ar: Dictionary = {
       "تدريبات وشهادات معتمدة من Microsoft و Cisco و Fortinet و EC-Council و PECB و PMI وأكثر. تعلّم عبر الإنترنت أو في الموقع، اكسب مكافآت مع تقدمك، واحصل على شهادة حقيقية.",
     browseCourses: "تصفح جميع الدورات",
     downloadPlanning: "تنزيل جدول جوان 2026",
+    heroPretitle: "حمّل جدول التدريبات لشهر جوان 2026",
     watchTour: "جولة سريعة في 90 ثانية",
     watchTourBody: "اكتشف كيف يكسب المتعلمون النقاط والشهادات ويحجزون الجلسات.",
     byTheNumbers: "أرقامنا",

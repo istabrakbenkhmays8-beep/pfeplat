@@ -83,6 +83,7 @@ const fr: Dictionary = {
       "Formations et certifications officielles Microsoft, Cisco, Fortinet, EC-Council, PECB, PMI et plus. Apprenez en ligne ou sur site, gagnez des récompenses et obtenez un vrai certificat.",
     browseCourses: "Parcourir tous les cours",
     downloadPlanning: "Télécharger le planning juin 2026",
+    heroPretitle: "Téléchargez notre planning des formations Juin 2026",
     watchTour: "Visite guidée de 90 secondes",
     watchTourBody: "Voyez comment les apprenants gagnent des pièces, des certificats et réservent leurs sessions.",
     byTheNumbers: "Les chiffres",

@@ -47,13 +47,13 @@ export function UserMenu({ variant, labels = DEFAULT_LABELS }: { variant: "publi
       <>
         <Link
           href="/auth/login"
-          className="hidden sm:inline-flex h-9 items-center rounded-md px-3 text-sm font-medium text-fg hover:bg-muted"
+          className="hidden sm:inline-flex h-9 items-center whitespace-nowrap rounded-md px-3 text-sm font-medium text-fg hover:bg-muted"
         >
           {labels.signIn}
         </Link>
         <Link
           href="/auth/register"
-          className="inline-flex h-9 items-center rounded-md bg-brand px-3 text-sm font-medium text-brand-foreground hover:bg-brand-600"
+          className="inline-flex h-9 items-center whitespace-nowrap rounded-md bg-brand px-3 text-sm font-medium text-brand-foreground hover:bg-brand-600"
         >
           {labels.getStarted}
         </Link>

@@ -28,7 +28,7 @@ export async function Header({
         <div className="flex h-16 items-center gap-4">
           {variant === "app" && <MobileNavToggle />}
           <Link href="/" aria-label="Advancia Training — home" className="flex items-center">
-            <Logo height={40} className="text-fg" />
+            <Logo height={40} />
           </Link>
 
           {variant === "public" && nav.length > 0 && (

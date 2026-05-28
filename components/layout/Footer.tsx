@@ -87,7 +87,7 @@ export async function Footer() {
         {/* 4 columns */}
         <div className="grid gap-10 py-12 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <Logo height={48} className="text-white" />
+            <Logo height={48} variant="white" />
             <p className="mt-4 max-w-xs text-sm text-white/70">{t.footer.tagline}</p>
           </div>
 

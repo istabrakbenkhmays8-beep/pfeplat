@@ -1,12 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/layout/Container";
+import { domainImageFor } from "@/lib/domainImage";
 import { KpiCard } from "@/components/ui/KpiCard";
 import { CourseCard } from "@/components/cards/CourseCard";
 import { VideoHero } from "@/components/home/VideoHero";
 import { LearningFormats } from "@/components/home/LearningFormats";
 import { NetworkMap } from "@/components/home/NetworkMap";
 import { PartnersCarousel } from "@/components/home/PartnersCarousel";
+import { ZelligeDivider } from "@/components/ui/ZelligeDivider";
 import {
   countByGroup,
   countByVendor,
@@ -20,24 +22,24 @@ export const dynamic = "force-dynamic";
 const testimonials = [
   {
     quote:
-      "The trainer was exceptional. I left with practical confidence and passed the certification on first attempt.",
-    name: "Yacine B.",
+      "I joined Advancia straight after my engineering degree. The PMP track gave me a real edge — I passed on first attempt and landed my first lead role two months later.",
+    name: "Mahdi",
+    role: "PM · PMP alumni",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&h=160&q=80&auto=format&fit=crop&crop=faces",
+  },
+  {
+    quote:
+      "I took the AZ-104 with Ada and the trainer was simply brilliant. The hands-on labs felt exactly like work — I walked into my interview confident.",
+    name: "Istabrak",
     role: "Cloud engineer · AZ-104 alumni",
-    avatar: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=160&h=160&q=80&auto=format&fit=crop&crop=faces",
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=160&h=160&q=80&auto=format&fit=crop&crop=faces",
   },
   {
     quote:
       "Best ROI we've had on training in years. Our SOC team is operational on day one after the bootcamp.",
     name: "Sarra K.",
     role: "CISO · Banking sector",
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=160&h=160&q=80&auto=format&fit=crop&crop=faces",
-  },
-  {
-    quote:
-      "Hybrid sessions made it work for a distributed team across 3 countries. Highly recommended.",
-    name: "Mohamed A.",
-    role: "Head of IT · Telco",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&h=160&q=80&auto=format&fit=crop&crop=faces",
+    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=160&h=160&q=80&auto=format&fit=crop&crop=faces",
   },
 ];
 
@@ -54,6 +56,7 @@ export default async function HomePage() {
     <>
       {/* HERO with background video */}
       <VideoHero />
+      <ZelligeDivider />
 
       {/* LES CHIFFRES */}
       <section className="border-b border-border">
@@ -111,16 +114,27 @@ export default async function HomePage() {
               <p className="mt-2 text-muted-foreground">{t.home.browseByDomainBlurb}</p>
             </div>
           </div>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {groups.map((g) => (
               <Link
                 key={g.group}
                 href={`/catalog?group=${encodeURIComponent(g.group)}`}
-                className="rounded-xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:border-brand/50 hover:shadow-sm"
+                className="group relative aspect-[5/3] overflow-hidden rounded-xl border border-border bg-card transition hover:-translate-y-0.5 hover:border-brand/50 hover:shadow-md"
               >
-                <div className="mb-3 h-10 w-10 rounded-md bg-brand/10" aria-hidden />
-                <p className="font-semibold">{g.group}</p>
-                <p className="text-sm text-muted-foreground">{g.count} {g.count === 1 ? "course" : "courses"}</p>
+                <Image
+                  src={domainImageFor(g.group, 600)}
+                  alt=""
+                  fill
+                  sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw"
+                  className="object-cover transition group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
+                <div className="absolute inset-0 flex flex-col justify-end p-5 text-white">
+                  <p className="text-lg font-bold leading-tight">{g.group}</p>
+                  <p className="text-xs text-white/80">
+                    {g.count} {g.count === 1 ? "course" : "courses"}
+                  </p>
+                </div>
               </Link>
             ))}
           </div>

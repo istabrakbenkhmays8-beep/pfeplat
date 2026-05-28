@@ -68,6 +68,7 @@ export type Dictionary = {
     heroSubtitle: string;
     browseCourses: string;
     downloadPlanning: string;
+    heroPretitle: string;
     watchTour: string;
     watchTourBody: string;
     byTheNumbers: string;
@@ -194,6 +195,7 @@ const en: Dictionary = {
       "Authorized training and certifications from Microsoft, Cisco, Fortinet, EC-Council, PECB, PMI and more. Learn online or on-site, earn rewards as you progress, and get a real certificate.",
     browseCourses: "Browse all courses",
     downloadPlanning: "Download June 2026 planning",
+    heroPretitle: "Download our June 2026 training planning",
     watchTour: "Watch the 90-second tour",
     watchTourBody: "See how learners earn coins, certificates, and book sessions.",
     byTheNumbers: "By the numbers",
