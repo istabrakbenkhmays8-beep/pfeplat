@@ -1,36 +1,36 @@
-import Image from "next/image";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { Container } from "./Container";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { MobileNavToggle } from "./MobileNavToggle";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { UserMenu } from "./UserMenu";
+import { NotificationBell } from "./NotificationBell";
+import { Logo } from "@/components/ui/Logo";
+import { getSession } from "@/lib/session";
+import { getT } from "@/src/i18n/server";
 
 type Nav = { href: string; label: string };
 
-export function Header({
+export async function Header({
   variant = "public",
   nav = [],
 }: {
   variant?: "public" | "app";
   nav?: Nav[];
 }) {
+  const [c, { t }, session] = await Promise.all([cookies(), getT(), getSession()]);
+  const locale = c.get("locale")?.value ?? "en";
+  const signedIn = !!session?.user;
+
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-surface/85 backdrop-blur supports-[backdrop-filter]:bg-surface/70">
       <Container size="wide">
         <div className="flex h-16 items-center gap-4">
           {variant === "app" && <MobileNavToggle />}
           <Link href="/" aria-label="Advancia Training — home" className="flex items-center">
-            <span className="inline-flex items-center rounded-md px-1 py-0.5 dark:bg-white">
-              <Image
-                src="/brand/advancia-logo.png"
-                alt="Advancia Training"
-                width={175}
-                height={64}
-                priority
-                className="h-7 w-auto sm:h-8"
-              />
-            </span>
+            <Logo height={40} />
           </Link>
 
           {variant === "public" && nav.length > 0 && (
@@ -49,13 +49,25 @@ export function Header({
 
           {variant === "public" && (
             <div className="hidden md:block ms-auto w-full max-w-sm">
-              <SearchBar size="sm" placeholder="Search courses…" />
+              <SearchBar size="sm" placeholder={t.common.searchPlaceholder} />
             </div>
           )}
 
           <div className={variant === "public" ? "flex items-center gap-2" : "ms-auto flex items-center gap-2"}>
+            <LanguageSwitcher current={locale} />
             <ThemeToggle />
-            <UserMenu variant={variant} />
+            {signedIn && <NotificationBell />}
+            <UserMenu
+              variant={variant}
+              labels={{
+                signIn: t.common.signIn,
+                getStarted: t.common.getStarted,
+                dashboard: t.common.dashboard,
+                coins: t.common.coins,
+                profile: t.common.profile,
+                signOut: t.common.signOut,
+              }}
+            />
           </div>
         </div>
       </Container>

@@ -13,3 +13,4 @@ export * from "./CoinTransaction";
 export * from "./EmailToken";
 export * from "./AuditLog";
 export * from "./AIConversation";
+export * from "./Notification";

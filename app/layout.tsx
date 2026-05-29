@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { Toaster } from "react-hot-toast";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { SessionProvider } from "@/components/providers/SessionProvider";
+import { ChatWidget } from "@/components/ai/ChatWidget";
 import "./globals.css";
 
 const inter = Inter({
@@ -76,6 +77,7 @@ export default async function RootLayout({
         <SessionProvider>
           <ThemeProvider initialTheme={initialTheme}>
             {children}
+            <ChatWidget />
             <Toaster
               position="top-center"
               toastOptions={{

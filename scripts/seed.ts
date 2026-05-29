@@ -12,6 +12,7 @@ import mongoose from "mongoose";
 
 import { connectDb, disconnectDb } from "../src/lib/db";
 import {
+  Assessment,
   Category,
   Course,
   Enrollment,
@@ -20,7 +21,7 @@ import {
   Trainer,
   User,
 } from "../src/models";
-import { categories as seedCategories, courses as seedCourses } from "../src/data/seed";
+import { categories as seedCategories, courses as seedCourses, priceForCourse, coinRewardForCourse } from "../src/data/seed";
 
 const DEFAULT_PW = "ChangeMe!2026";
 
@@ -37,6 +38,7 @@ async function main() {
     Session.deleteMany({}),
     Reservation.deleteMany({}),
     Enrollment.deleteMany({}),
+    Assessment.deleteMany({}),
   ]);
 
   // Categories
@@ -64,8 +66,8 @@ async function main() {
       category: slugToCatId.get(c.categorySlug),
       modes: ["live_online", "on_site"],
       level: "intermediate",
-      priceTnd: c.durationDays * 600,
-      coinReward: c.durationDays * 50,
+      priceTnd: priceForCourse(c.code, c.durationDays),
+      coinReward: coinRewardForCourse(c.code, c.durationDays),
       isFeatured: featuredCodes.has(c.code),
       isPublished: true,
     })),
@@ -146,6 +148,96 @@ async function main() {
     );
   }
   console.log(`  ${fixtures.length} users upserted (default password: ${DEFAULT_PW})`);
+
+  // A few sample assessments so the quiz runtime has something to drive.
+  console.log("→ Inserting sample assessments…");
+  const sampleQuizzes: Array<{ code: string; questions: Array<{ prompt: string; options: Array<{ text: string; isCorrect: boolean }>; explanation?: string }> }> = [
+    {
+      code: "AZ-104",
+      questions: [
+        {
+          prompt: "Which Azure service hosts virtual machines?",
+          options: [
+            { text: "Azure Virtual Machines", isCorrect: true },
+            { text: "Azure Functions", isCorrect: false },
+            { text: "Azure DevOps", isCorrect: false },
+            { text: "Azure Logic Apps", isCorrect: false },
+          ],
+        },
+        {
+          prompt: "Which tier gives the strongest SLA for a virtual machine?",
+          options: [
+            { text: "Spot", isCorrect: false },
+            { text: "Two or more VMs in an availability set", isCorrect: false },
+            { text: "Two or more VMs across availability zones", isCorrect: true },
+            { text: "A single VM with Premium SSD", isCorrect: false },
+          ],
+        },
+        {
+          prompt: "Which command-line tool ships with the official Azure CLI?",
+          options: [
+            { text: "az", isCorrect: true },
+            { text: "azure", isCorrect: false },
+            { text: "msaz", isCorrect: false },
+            { text: "cloud-cli", isCorrect: false },
+          ],
+        },
+      ],
+    },
+    {
+      code: "CCNA",
+      questions: [
+        {
+          prompt: "Which OSI layer does an IP address belong to?",
+          options: [
+            { text: "Layer 1 — Physical", isCorrect: false },
+            { text: "Layer 2 — Data Link", isCorrect: false },
+            { text: "Layer 3 — Network", isCorrect: true },
+            { text: "Layer 4 — Transport", isCorrect: false },
+          ],
+        },
+        {
+          prompt: "How many usable host addresses are in a /29 IPv4 subnet?",
+          options: [
+            { text: "2", isCorrect: false },
+            { text: "6", isCorrect: true },
+            { text: "8", isCorrect: false },
+            { text: "14", isCorrect: false },
+          ],
+        },
+        {
+          prompt: "Which protocol is connectionless?",
+          options: [
+            { text: "TCP", isCorrect: false },
+            { text: "UDP", isCorrect: true },
+            { text: "TLS", isCorrect: false },
+            { text: "SSH", isCorrect: false },
+          ],
+        },
+      ],
+    },
+  ];
+  let assessmentsInserted = 0;
+  for (const q of sampleQuizzes) {
+    const cid = codeToCourseId.get(q.code);
+    if (!cid) continue;
+    await Assessment.create({
+      course: cid,
+      title: `${q.code} — practice assessment`,
+      description: "A short quiz to validate the basics.",
+      passThreshold: 70,
+      timeLimitMinutes: 15,
+      maxAttempts: 3,
+      questions: q.questions.map((qq) => ({
+        ...qq,
+        type: "single_choice",
+        points: 1,
+      })),
+      isPublished: true,
+    });
+    assessmentsInserted++;
+  }
+  console.log(`  ${assessmentsInserted} assessments`);
 
   // Summary
   console.log("\n✓ Seed complete");

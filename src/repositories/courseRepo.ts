@@ -12,6 +12,8 @@ export type CatalogCourse = {
   title: string;
   summary?: string;
   durationDays: number;
+  priceTnd: number;
+  coinReward: number;
   isFeatured: boolean;
   category: { slug: string; name: string; vendor: string; group: string };
   nextSession?: { startsAt: string; endsAt: string };
@@ -26,6 +28,8 @@ async function withNextSession(course: any): Promise<CatalogCourse> {
     title: course.title,
     summary: course.summary,
     durationDays: course.durationDays,
+    priceTnd: course.priceTnd ?? 0,
+    coinReward: course.coinReward ?? 0,
     isFeatured: course.isFeatured,
     category: {
       slug: course.category.slug,

@@ -89,6 +89,12 @@ export function LoginForm({
         </p>
       )}
 
+      <p className="text-end text-xs">
+        <a href="/auth/forgot" className="font-medium text-brand hover:underline">
+          Forgot password?
+        </a>
+      </p>
+
       <button
         type="submit"
         disabled={isSubmitting}

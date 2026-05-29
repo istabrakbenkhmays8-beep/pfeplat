@@ -2,22 +2,155 @@ export type Dictionary = {
   common: {
     signIn: string;
     getStarted: string;
+    signOut: string;
     explore: string;
     contact: string;
     dashboard: string;
+    profile: string;
+    coins: string;
     catalog: string;
     learnMore: string;
     loading: string;
     emptyState: string;
     error: string;
-  };
-  home: {
-    heroTitle: string;
-    heroSubtitle: string;
+    searchPlaceholder: string;
+    searchAction: string;
   };
   nav: {
-    catalog: string;
+    formations: string;
+    calendrier: string;
+    certifications: string;
+    partners: string;
+    about: string;
     contact: string;
+  };
+  topbar: {
+    myAccount: string;
+    loginOrRegister: string;
+  };
+  learning: {
+    sectionTitle: string;
+    onsiteTitle: string;
+    onsiteBullets: string[];
+    remoteTitle: string;
+    remoteBullets: string[];
+    corporateTitle: string;
+    corporateBullets: string[];
+    cta: string;
+  };
+  network: {
+    title: string;
+    sectionLabel: string;
+  };
+  partners: {
+    sectionLabel: string;
+    title: string;
+  };
+  newsletter: {
+    title: string;
+    body: string;
+    placeholder: string;
+    subscribe: string;
+  };
+  footerExt: {
+    liensUtiles: string;
+    informations: string;
+    contactCol: string;
+    jobs: string;
+    presentation: string;
+    resources: string;
+    ourGroup: string;
+  };
+  home: {
+    badge: string;
+    heroTitle1: string;
+    heroTitleAccent: string;
+    heroSubtitle: string;
+    browseCourses: string;
+    downloadPlanning: string;
+    heroPretitle: string;
+    watchTour: string;
+    watchTourBody: string;
+    byTheNumbers: string;
+    byTheNumbersBlurb: string;
+    yearsExpertise: string;
+    yearsExpertiseHint: string;
+    coursesAvailable: string;
+    coursesAvailableHint: string;
+    authorizedPartners: string;
+    authorizedPartnersHint: string;
+    competencyDomains: string;
+    competencyDomainsHint: string;
+    threeWays: string;
+    threeWaysBlurb: string;
+    onSiteTitle: string;
+    onSiteBody: string;
+    liveOnlineTitle: string;
+    liveOnlineBody: string;
+    corporateTitle: string;
+    corporateBody: string;
+    browseByPartner: string;
+    browseByPartnerBlurb: string;
+    seeAllCourses: string;
+    browseByDomain: string;
+    browseByDomainBlurb: string;
+    mostPopular: string;
+    mostPopularBlurb: string;
+    viewAll: string;
+    testimonials: string;
+    testimonialsBlurb: string;
+    authorizedPartnerOf: string;
+    ctaTitle: string;
+    ctaBody: string;
+    createFreeAccount: string;
+    talkToUs: string;
+  };
+  footer: {
+    tagline: string;
+    ourOffices: string;
+    allRightsReserved: string;
+  };
+  catalog: {
+    title: string;
+    subtitle: string;
+    found: string;
+    foundPlural: string;
+    noMatch: string;
+    noMatchHelp: string;
+    clearFilters: string;
+    filtersLabel: string;
+    partner: string;
+    allPartners: string;
+    domain: string;
+    allDomains: string;
+  };
+  detail: {
+    onlineOrOnsite: string;
+    officialCert: string;
+    nextSession: string;
+    scheduleLabel: string;
+    contactUsForSchedule: string;
+    enrollNow: string;
+    requestQuote: string;
+    whatYoullLearn: string;
+    moreFrom: string;
+    seeAllVendor: string;
+  };
+  calendarPage: {
+    title: string;
+    subtitle: string;
+    downloadFullPlanning: string;
+  };
+  userDash: {
+    welcome: string;
+    pickUp: string;
+    inProgress: string;
+    coinsEarned: string;
+    certificates: string;
+    continueLearning: string;
+    viewAll: string;
+    noEnrollments: string;
+    browseCourses: string;
   };
 };
 
@@ -25,22 +158,173 @@ const en: Dictionary = {
   common: {
     signIn: "Sign in",
     getStarted: "Get started",
+    signOut: "Sign out",
     explore: "Explore courses",
     contact: "Contact us",
     dashboard: "Dashboard",
+    profile: "Profile",
+    coins: "Coins",
     catalog: "Courses",
     learnMore: "Learn more",
     loading: "Loading…",
     emptyState: "Nothing here yet.",
     error: "Something went wrong.",
-  },
-  home: {
-    heroTitle: "Learn skills that change your career.",
-    heroSubtitle: "Online and on-site training, with real certificates and rewards as you progress.",
+    searchPlaceholder: "Search courses, vendors, certifications…",
+    searchAction: "Search",
   },
   nav: {
-    catalog: "Courses",
+    formations: "Courses",
+    calendrier: "Calendar",
+    certifications: "Certifications",
+    partners: "Partners",
+    about: "About us",
     contact: "Contact",
+  },
+  topbar: {
+    myAccount: "My account",
+    loginOrRegister: "Sign in or register",
+  },
+  learning: {
+    sectionTitle: "Learn the way you want — anywhere in the world",
+    onsiteTitle: "In-person class",
+    onsiteBullets: [
+      "Learn the way you want, anywhere in the world.",
+      "Interact with our instructors and your peers in the room.",
+      "Pick the training centre nearest to you.",
+    ],
+    remoteTitle: "Remote class",
+    remoteBullets: [
+      "Take a live instructor-led training online.",
+      "Just like in the classroom: chat with trainers and learners.",
+      "Discover the flexibility of our platform.",
+    ],
+    corporateTitle: "Corporate (intra)",
+    corporateBullets: [
+      "We organise your in-house sessions on our premises.",
+      "Beyond off-the-shelf programmes: flexible and adaptable.",
+      "Every session is led by a certified instructor.",
+    ],
+    cta: "Learn more",
+  },
+  network: {
+    title: "Our network",
+    sectionLabel: "Where to find us",
+  },
+  partners: {
+    sectionLabel: "Partners",
+    title: "Our partners",
+  },
+  newsletter: {
+    title: "Newsletter",
+    body: "Subscribe to the newsletter and get all the latest updates.",
+    placeholder: "Email",
+    subscribe: "Subscribe",
+  },
+  footerExt: {
+    liensUtiles: "Useful links",
+    informations: "Information",
+    contactCol: "Contact",
+    jobs: "Job openings",
+    presentation: "About",
+    resources: "Resources",
+    ourGroup: "Our group",
+  },
+  home: {
+    badge: "Leader in IT certification across Tunisia · Morocco · France · Côte d'Ivoire",
+    heroTitle1: "Boost your career.",
+    heroTitleAccent: "Get certified.",
+    heroSubtitle:
+      "Authorized training and certifications from Microsoft, Cisco, Fortinet, EC-Council, PECB, PMI and more. Learn online or on-site, earn rewards as you progress, and get a real certificate.",
+    browseCourses: "Browse all courses",
+    downloadPlanning: "Download June 2026 planning",
+    heroPretitle: "Download our June 2026 training planning",
+    watchTour: "Watch the 90-second tour",
+    watchTourBody: "See how learners earn coins, certificates, and book sessions.",
+    byTheNumbers: "By the numbers",
+    byTheNumbersBlurb: "Trusted by thousands of learners and dozens of enterprise customers.",
+    yearsExpertise: "Years of expertise",
+    yearsExpertiseHint: "Leader of IT certification in Tunisia",
+    coursesAvailable: "Courses available",
+    coursesAvailableHint: "In our June 2026 schedule",
+    authorizedPartners: "Authorized partners",
+    authorizedPartnersHint: "Microsoft, Cisco, EC-Council…",
+    competencyDomains: "Competency domains",
+    competencyDomainsHint: "From Cloud to Cybersecurity",
+    threeWays: "Three ways to learn",
+    threeWaysBlurb: "Pick the format that fits your team and your pace.",
+    onSiteTitle: "On-site classes",
+    onSiteBody:
+      "Train in our centres in Tunis, Casablanca, Aix-en-Provence or Abidjan. Hands-on labs and direct access to certified instructors.",
+    liveOnlineTitle: "Live online",
+    liveOnlineBody:
+      "Join real instructor-led sessions from anywhere. Same labs, same certificate, no travel required.",
+    corporateTitle: "Corporate & custom",
+    corporateBody:
+      "Tailored plans for teams of any size — on your premises or ours, in English, French or Arabic.",
+    browseByPartner: "Browse by partner",
+    browseByPartnerBlurb: "Authorized training and exams across the vendors we cover.",
+    seeAllCourses: "See all courses →",
+    browseByDomain: "Browse by domain",
+    browseByDomainBlurb: "From Cloud to Cybersecurity, find the track that matches your goal.",
+    mostPopular: "Most popular this month",
+    mostPopularBlurb: "The certifications our learners are taking right now.",
+    viewAll: "View all →",
+    testimonials: "What our learners say",
+    testimonialsBlurb: "Stories from people who passed their certification with us.",
+    authorizedPartnerOf: "Authorized training partner of",
+    ctaTitle: "Ready to take the next step?",
+    ctaBody:
+      "Create a free account and start your first course today. Earn coins as you learn, and turn them into discounts.",
+    createFreeAccount: "Create a free account",
+    talkToUs: "Talk to us",
+  },
+  footer: {
+    tagline:
+      "Boost your career. Get certified. Online and on-site training with real certificates and rewards as you progress.",
+    ourOffices: "Our offices",
+    allRightsReserved: "All rights reserved.",
+  },
+  catalog: {
+    title: "Course catalog",
+    subtitle: "Browse our certification tracks across our authorized partners and domains.",
+    found: "course found",
+    foundPlural: "courses found",
+    noMatch: "No courses match these filters",
+    noMatchHelp: "Try a different search term or clear the filters.",
+    clearFilters: "Clear filters →",
+    filtersLabel: "Filters:",
+    partner: "Partner",
+    allPartners: "All partners",
+    domain: "Domain",
+    allDomains: "All domains",
+  },
+  detail: {
+    onlineOrOnsite: "Online or on-site",
+    officialCert: "Official certificate",
+    nextSession: "Next session",
+    scheduleLabel: "Schedule",
+    contactUsForSchedule: "We'll arrange a session that fits your team.",
+    enrollNow: "Enroll now",
+    requestQuote: "Request a quote",
+    whatYoullLearn: "What you'll learn",
+    moreFrom: "More from",
+    seeAllVendor: "See all courses →",
+  },
+  calendarPage: {
+    title: "Training calendar",
+    subtitle: "Sessions scheduled across all our domains. Click any course to see details and reserve a seat.",
+    downloadFullPlanning: "Download the full planning (PDF)",
+  },
+  userDash: {
+    welcome: "Welcome back",
+    pickUp: "Pick up where you left off.",
+    inProgress: "Courses in progress",
+    coinsEarned: "Coins earned",
+    certificates: "Certificates",
+    continueLearning: "Continue learning",
+    viewAll: "View all →",
+    noEnrollments: "You haven't enrolled in any course yet.",
+    browseCourses: "Browse courses",
   },
 };
 

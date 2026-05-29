@@ -17,6 +17,11 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
+type RegisterResponse = {
+  id: string;
+  email: string;
+  welcomeEmailStatus?: "sent" | "not_configured" | "failed";
+};
 
 export function RegisterForm() {
   const router = useRouter();
@@ -47,7 +52,15 @@ export function RegisterForm() {
       return;
     }
 
-    toast.success("Account created — signing you in…");
+    const body = (await res.json()) as RegisterResponse;
+    const welcomeMessage =
+      body.welcomeEmailStatus === "sent"
+        ? "Account created. Welcome email sent."
+        : body.welcomeEmailStatus === "failed"
+        ? "Account created. We could not send the welcome email right now."
+        : "Account created. Email setup is not ready yet on this machine.";
+
+    toast.success(`${welcomeMessage} Signing you in...`);
     const signin = await signIn("credentials", {
       email: data.email,
       password: data.password,

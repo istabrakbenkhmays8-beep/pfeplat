@@ -5,7 +5,25 @@ import { signOut, useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { LogOut, LayoutDashboard, Coins, UserCircle2 } from "lucide-react";
 
-export function UserMenu({ variant }: { variant: "public" | "app" }) {
+type Labels = {
+  signIn: string;
+  getStarted: string;
+  dashboard: string;
+  coins: string;
+  profile: string;
+  signOut: string;
+};
+
+const DEFAULT_LABELS: Labels = {
+  signIn: "Sign in",
+  getStarted: "Get started",
+  dashboard: "Dashboard",
+  coins: "Coins",
+  profile: "Profile",
+  signOut: "Sign out",
+};
+
+export function UserMenu({ variant, labels = DEFAULT_LABELS }: { variant: "public" | "app"; labels?: Labels }) {
   const { data, status } = useSession();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -29,15 +47,15 @@ export function UserMenu({ variant }: { variant: "public" | "app" }) {
       <>
         <Link
           href="/auth/login"
-          className="hidden sm:inline-flex h-9 items-center rounded-md px-3 text-sm font-medium text-fg hover:bg-muted"
+          className="hidden sm:inline-flex h-9 items-center whitespace-nowrap rounded-md px-3 text-sm font-medium text-fg hover:bg-muted"
         >
-          Sign in
+          {labels.signIn}
         </Link>
         <Link
           href="/auth/register"
-          className="inline-flex h-9 items-center rounded-md bg-brand px-3 text-sm font-medium text-brand-foreground hover:bg-brand-600"
+          className="inline-flex h-9 items-center whitespace-nowrap rounded-md bg-brand px-3 text-sm font-medium text-brand-foreground hover:bg-brand-600"
         >
-          Get started
+          {labels.getStarted}
         </Link>
       </>
     );
@@ -57,6 +75,10 @@ export function UserMenu({ variant }: { variant: "public" | "app" }) {
   const roleLabel =
     user.role === "super_admin" ? "Super admin" : user.role === "admin" ? "Admin" : "Learner";
 
+  // The avatar can be a data URL (from /profile upload) or any http(s) URL.
+  // We render <img> directly for both — next/image refuses arbitrary data URLs.
+  const avatar = user.avatarUrl ?? null;
+
   return (
     <div ref={ref} className="relative">
       <button
@@ -66,9 +88,19 @@ export function UserMenu({ variant }: { variant: "public" | "app" }) {
         aria-expanded={open}
         className="inline-flex h-9 items-center gap-2 rounded-full border border-border bg-surface pe-3 ps-1 text-sm font-medium hover:bg-muted"
       >
-        <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand text-xs font-bold text-brand-foreground">
-          {initials}
-        </span>
+        {avatar ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={avatar}
+            alt=""
+            className="h-7 w-7 rounded-full object-cover"
+            referrerPolicy="no-referrer"
+          />
+        ) : (
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand text-xs font-bold text-brand-foreground">
+            {initials}
+          </span>
+        )}
         <span className="hidden sm:inline">{user.name?.split(" ")[0] || "Account"}</span>
       </button>
 
@@ -92,19 +124,19 @@ export function UserMenu({ variant }: { variant: "public" | "app" }) {
                 className="flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-muted"
               >
                 <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
-                Dashboard
+                {labels.dashboard}
               </Link>
             </li>
             {user.role === "user" && (
               <li>
                 <Link
-                  href="/dashboard"
+                  href="/wallet"
                   role="menuitem"
                   className="flex items-center justify-between gap-3 rounded-md px-3 py-2 text-sm hover:bg-muted"
                 >
                   <span className="flex items-center gap-3">
                     <Coins className="h-4 w-4 text-muted-foreground" />
-                    Coins
+                    {labels.coins}
                   </span>
                   <span className="font-semibold text-brand">{user.walletCoins}</span>
                 </Link>
@@ -112,12 +144,12 @@ export function UserMenu({ variant }: { variant: "public" | "app" }) {
             )}
             <li>
               <Link
-                href="/dashboard"
+                href="/profile"
                 role="menuitem"
                 className="flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-muted"
               >
                 <UserCircle2 className="h-4 w-4 text-muted-foreground" />
-                Profile
+                {labels.profile}
               </Link>
             </li>
             <li>
@@ -128,7 +160,7 @@ export function UserMenu({ variant }: { variant: "public" | "app" }) {
                 className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-fg hover:bg-muted"
               >
                 <LogOut className="h-4 w-4 text-muted-foreground" />
-                Sign out
+                {labels.signOut}
               </button>
             </li>
           </ul>

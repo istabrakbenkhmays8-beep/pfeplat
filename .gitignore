@@ -55,3 +55,8 @@ public/uploads/
 
 # unzipped brand source assets (originals live outside the repo)
 _brand-source/
+
+# transient PR body file
+.pr-body.md
+
+.vercel

@@ -2,6 +2,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { connectDb } from "@/lib/db";
 import { User } from "@/src/models";
+import { sendWelcomeEmail } from "@/src/services/emailTemplates";
 
 export const runtime = "nodejs";
 
@@ -48,5 +49,22 @@ export async function POST(req: Request) {
     status: "active",
   });
 
-  return Response.json({ id: String(u._id), email: u.email }, { status: 201 });
+  let welcomeEmailStatus: "sent" | "not_configured" | "failed" = "not_configured";
+  try {
+    const mail = await sendWelcomeEmail({ to: u.email, firstName: u.firstName });
+    welcomeEmailStatus =
+      mail.reason === "transport_error" ? "failed" : mail.delivered ? "sent" : "not_configured";
+  } catch (err) {
+    welcomeEmailStatus = "failed";
+    console.warn("[register] welcome email failed:", err);
+  }
+
+  return Response.json(
+    {
+      id: String(u._id),
+      email: u.email,
+      welcomeEmailStatus,
+    },
+    { status: 201 },
+  );
 }

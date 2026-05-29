@@ -37,6 +37,22 @@ const UserSchema = new Schema(
     lastLoginAt: { type: Date },
     failedLoginCount: { type: Number, default: 0 },
     lockedUntil: { type: Date },
+
+    /** Streak: contiguous days of activity (login OR course completion). */
+    currentStreak: { type: Number, default: 0, min: 0 },
+    longestStreak: { type: Number, default: 0, min: 0 },
+    lastActiveOn: { type: Date },
+
+    /** Earned badges. `code` is a known constant; metadata lives in src/lib/badges.ts. */
+    badges: {
+      type: [
+        {
+          code: { type: String, required: true },
+          awardedAt: { type: Date, default: Date.now },
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true },
 );

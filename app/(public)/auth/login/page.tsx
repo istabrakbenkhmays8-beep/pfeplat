@@ -20,24 +20,6 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
             Create an account
           </Link>
         </p>
-
-        <details className="mt-6 rounded-md border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
-          <summary className="cursor-pointer font-medium text-fg">Demo accounts</summary>
-          <ul className="mt-2 space-y-1">
-            <li>
-              <code className="rounded bg-muted px-1">superadmin@advancia-training.com</code> — full access
-            </li>
-            <li>
-              <code className="rounded bg-muted px-1">admin@advancia-training.com</code> — admin
-            </li>
-            <li>
-              <code className="rounded bg-muted px-1">learner@advancia-training.com</code> — regular user
-            </li>
-            <li>
-              Password: <code className="rounded bg-muted px-1">ChangeMe!2026</code>
-            </li>
-          </ul>
-        </details>
       </div>
     </Container>
   );
